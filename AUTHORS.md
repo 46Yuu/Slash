@@ -1,5 +1,3 @@
-Texte _dont_ certains __éléments__ sont formatés **pour _être_** en *italique*, en **bold** ou ~~barrés~~.
-MEMBRES DE L'EQUIPE
 # MEMBRES DE L'EQUIPE
 | | | | |
 |---:|---|---|---|
