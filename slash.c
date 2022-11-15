@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include<readline/readline.h>
-#include<readline/history.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 #define MAX_ARGS_NUMBER 4096
 #define MAX_ARGS_STRLEN 4096
 #define MAX_FORMAT_STRLEN 30 // taille maximale pour le formatage
-
+#define MAX_TOKEN_NUMBER 10 //nombre maximale de tokens dans une ligne de commande
 
 int main(int argc, char **argv) {
     printf("Test de Make sur slash\n");
@@ -23,15 +23,39 @@ int main(int argc, char **argv) {
         -Creer des dossiers test aussi pour les commandes
         -Ajouter -lreadline au make file
     */
+    rl_outstream = stderr;
     while ((input = readline("taper $ -"))) {
-        if (strlen(input) > 0) {
+        int len = strlen(input);
+        if (len > 0) {
             //ajoute la commande à l'historique pour l'utilisation flêches directionnelles 
             add_history(input);
         }
-
-        printf("Le truc tapé est [%s]\n", input);
+        //copie la commande pour pouvoir compter le nombre de cases de tokens
+        char* tmp = malloc(len*sizeof(char)+1);
+        if(tmp == NULL){
+            free(tmp);
+            exit(1);
+        }
+        strcpy(tmp, input);
+        //compte la taille du tableau de tokens avec comme séparateur " "
+        int size = 0;
+        char* token = strtok(tmp, " ");
+        while (token != NULL){
+            size++;
+            token = strtok(NULL, " ");
+        }
+        //crée le tableau de tokens de taille size et ajoute les tokens séparés par " " dedans
+        char *tokens[size];
+        int i =0;
+        token = strtok(input, " ");
+        while (token != NULL){
+            tokens[i] = token;
+            i++;
+            token = strtok(NULL, " ");
+        }
 
         // readline fait un malloc à chaque fois donc on dois le free à la fin
+        free(tmp);
         free(input);
     }
 

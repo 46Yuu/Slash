@@ -1,10 +1,10 @@
 CC = gcc
-CFLAGS = -Wall -o
+CFLAGS = -Wall -o 
 
 all: slash exit cd pwd
 
 slash: slash.c
-	$(CC) $(CFLAGS) slash slash.c
+	$(CC) $(CFLAGS) slash slash.c -lreadline 
 
 exit: exit.c
 	$(CC) $(CFLAGS) exit exit.c
