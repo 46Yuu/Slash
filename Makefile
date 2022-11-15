@@ -1,19 +1,25 @@
 CC = gcc
-CFLAGS = -Wall -o 
+CFLAGS = -Wall -c
 
-all: slash exit cd pwd
+all: mystring exit cd pwd slash run
 
-slash: slash.c
-	$(CC) $(CFLAGS) slash slash.c -lreadline 
-
+mystring : mystring.c
+	$(CC) $(CFLAGS) mystring.c
+	
 exit: exit.c
-	$(CC) $(CFLAGS) exit exit.c
+	$(CC) $(CFLAGS) exit.c
 
 cd: cd.c 
-	$(CC) $(CFLAGS) cd cd.c
+	$(CC) $(CFLAGS) cd.c
 
 pwd: pwd.c
-	$(CC) $(CFLAGS) pwd pwd.c
+	$(CC) $(CFLAGS) pwd.c
+	
+slash: slash.c
+	$(CC) $(CFLAGS) slash.c 
+
+run: slash.c
+	$(CC) mystring.o exit.o cd.o pwd.o slash.o -o slash -lreadline 
 
 clean: 
-	$(RM) slash exit cd pwd 
+	$(RM) slash.o mystring.o exit.o cd.o pwd.o slash 
