@@ -8,6 +8,7 @@
 #define MAX_ARGS_NUMBER 4096
 #define MAX_ARGS_STRLEN 4096
 #define MAX_FORMAT_STRLEN 30 // taille maximale pour le formatage
+#define PATH_MAX 4096
 
 
 int main(int argc, char **argv) {
@@ -15,7 +16,7 @@ int main(int argc, char **argv) {
     printf(" derniere positiond de / est %s \n",strrchr(chemin,'/'));
     printf("Bah du coup la taille à enlever est %zu\n",strlen(strrchr(chemin,'/')));
     printf("---------------------Essaie avec mystring-----------------------");
-    struct string * path = string_new(200);
+    struct string * path = string_new(PATH_MAX);
     printf("Affichage de string vide : %s\n",path->data);
     string_append(path,"/aaa/bbb/CCC");
     printf("Affichage de apres append : %s\n",path->data);

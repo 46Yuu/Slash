@@ -3,6 +3,11 @@
 #include <string.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include "cd.h"
+#include "exit.h"
+#include "pwd.h"
+#include "mystring.h"
+
 
 #define MAX_ARGS_NUMBER 4096
 #define MAX_ARGS_STRLEN 4096
@@ -53,19 +58,7 @@ int main(int argc, char **argv) {
             i++;
             token = strtok(NULL, " ");
         }
-        //verification et appel de la commande
-        if(strcmp(tokens[0],"exit") == 0){
-            printf("lancement de la fonction exit\n");
-        }
-        else if(strcmp(tokens[0],"cd") == 0){
-            printf("lancement de la fonction cd\n");
-        }
-        else if(strcmp(tokens[0],"pwd") == 0){
-            printf("lancement de la fonction pwd\n");
-        }
-        else{
-            printf("Erreur , aucune commande reconnue\n");
-        }
+
         // readline fait un malloc à chaque fois donc on dois le free à la fin
         free(tmp);
         free(input);
