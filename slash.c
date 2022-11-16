@@ -13,12 +13,37 @@
 #define MAX_ARGS_STRLEN 4096
 #define MAX_FORMAT_STRLEN 30 // taille maximale pour le formatage
 #define MAX_TOKEN_NUMBER 10 //nombre maximale de tokens dans une ligne de commande
+#define PATH_MAX 4096 // taille maximale du chemin
+
 
 int main(int argc, char **argv) {
-    printf("Test de Make sur slash\n");
+    printf("------------------------Test de Make sur slash-------------\n");
+
 
     char* input;
-  
+    char * buff;
+
+    buff = malloc(4096*sizeof(char));
+
+    if(buff == NULL){
+        printf("buff a pas marché\n");
+        return 1;
+    }
+    //recupération du répertoire courant et stockage dans buff
+    getcwd(buff,4096);
+
+    //Création et Remplissage de path par buff
+    struct string * path = string_new(PATH_MAX);
+    if(path == NULL){
+        printf("path a pas marché\n");
+        return 1;
+    }
+    string_append(path,buff);
+
+    //Free du buff    
+    free(buff);
+
+
     /* TODO: 
         -Pour le readline, faudra afficher le repertoire courant avant le $ donc faudra une variable repertoire
         courant qui changerea au fur et à mesure
@@ -26,10 +51,13 @@ int main(int argc, char **argv) {
         -Faudra un fonction pour le formatage du texte de cd à 30 caractères au plus par la gauche
         -faudra garder les valeurs de retour des return
         -Creer des dossiers test aussi pour les commandes
-        -Ajouter -lreadline au make file
     */
     rl_outstream = stderr;
-    while ((input = readline("taper $ -"))) {
+    char chemin[PATH_MAX+ 2]; // +2 car on affichera le dollar '$' et l'espace ' '
+    chemin[0] = '\0';
+    strcat(chemin,path->data);
+    strcat(chemin,"$ ");
+    while ((input = readline(chemin))) {
         int len = strlen(input);
         if (len > 0) {
             //ajoute la commande à l'historique pour l'utilisation flêches directionnelles 
@@ -64,5 +92,7 @@ int main(int argc, char **argv) {
         free(input);
     }
 
-  return 0;
+    //Pour faire un free de path
+    string_delete(path);
+    return 0;
 }

@@ -18,7 +18,14 @@ int main(int argc, char **argv) {
     printf("%s\n",buff);
     printf("La taille du truc est %zu\n",strlen(buff));
     free(buff);
-  
+    char toto[100];
+    strcat(toto,"Bien");
+    printf("toto est  %s\n",toto);
+    toto[0] = '\0';
+    printf("Now toto est  %s\n",toto);
+    strcat(toto,"Bien");
+    printf("Enfin toto est  %s\n",toto);
+
 
 
 
