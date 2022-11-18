@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "cd.h"
 
-void cdTest(){
+int cdTest(){
     printf("cd.c\n");
+    return 0;
 }

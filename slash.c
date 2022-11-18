@@ -57,6 +57,7 @@ int main(int argc, char **argv) {
     chemin[0] = '\0';
     strcat(chemin,path->data);
     strcat(chemin,"$ ");
+    int val =0;
     while ((input = readline(chemin))) {
         int len = strlen(input);
         if (len > 0) {
@@ -88,15 +89,15 @@ int main(int argc, char **argv) {
         }
         if(strcmp(tokens[0],"exit") == 0){
             printf("lancement de la fonction exit\n");
-            exitSlash();
+            return val;
         }
         else if(strcmp(tokens[0],"cd") == 0){
             printf("lancement de la fonction cd\n");
-            cdTest();
+            val = cdTest();
         }
         else if(strcmp(tokens[0],"pwd") == 0){
             printf("lancement de la fonction pwd\n");
-            pwd(tokens,size,path);
+            val = pwd(tokens,size,path);
         }
         else{
             printf("Erreur , aucune commande reconnue\n");
