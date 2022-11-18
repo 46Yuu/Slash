@@ -8,6 +8,7 @@
 int pwd(char *tokens[],int size,struct string * path){
     char chemin [PATH_MAX +1];
     strcat(chemin,path->data);
+    char buf [PATH_MAX +1];
 
     if (size >2){
         printf("Error in pwd , more than 1 option\n");
@@ -20,7 +21,9 @@ int pwd(char *tokens[],int size,struct string * path){
     }
     else {
         if(strcmp(tokens[1],"-P")==0){
-            printf("option de pwd = -P\n");//TODO mettre la référence absolue physique
+            realpath(chemin,buf);
+            strcat(buf,"\n");
+            printf("%s",buf);
             return 0;
         }
         else if(strcmp(tokens[1],"-L")==0){
