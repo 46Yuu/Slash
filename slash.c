@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "exit.h"
@@ -52,7 +53,7 @@ int main(int argc, char **argv) {
         -faudra garder les valeurs de retour des return
         -Creer des dossiers test aussi pour les commandes
     */
-    rl_outstream = stderr;
+   // rl_outstream = stderr;
     char chemin[PATH_MAX+ 2]; // +2 car on affichera le dollar '$' et l'espace ' '
     chemin[0] = '\0';
     strcat(chemin,path->data);
@@ -93,7 +94,8 @@ int main(int argc, char **argv) {
         }
         else if(strcmp(tokens[0],"cd") == 0){
             printf("lancement de la fonction cd\n");
-            val = cdTest();
+            val = cd(tokens,path);
+
         }
         else if(strcmp(tokens[0],"pwd") == 0){
             printf("lancement de la fonction pwd\n");
