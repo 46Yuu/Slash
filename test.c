@@ -27,7 +27,5 @@ int main(int argc, char **argv) {
     string_delete(path);
   
 
-
-
     return 0;
 }

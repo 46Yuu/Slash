@@ -52,12 +52,17 @@ int main(int argc, char **argv) {
         -faudra garder les valeurs de retour des return
         -Creer des dossiers test aussi pour les commandes
     */
+    int val =0;
     rl_outstream = stderr;
     char chemin[PATH_MAX+ 2]; // +2 car on affichera le dollar '$' et l'espace ' '
     chemin[0] = '\0';
+    char valeurRetour[2];
+    sprintf(valeurRetour,"%d",val);
+    strcat(chemin,"[");
+    strcat(chemin,valeurRetour);
+    strcat(chemin,"]");
     strcat(chemin,path->data);
     strcat(chemin,"$ ");
-    int val =0;
     while ((input = readline(chemin))) {
         int len = strlen(input);
         if (len > 0) {
