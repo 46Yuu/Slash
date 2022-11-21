@@ -48,22 +48,22 @@ int main(int argc, char **argv) {
         -Pour le readline, faudra afficher le repertoire courant avant le $ donc faudra une variable repertoire
         courant qui changerea au fur et à mesure
 
-        -Faudra un fonction pour le formatage du texte de cd à 30 caractères au plus par la gauche
         -faudra garder les valeurs de retour des return
         -Creer des dossiers test aussi pour les commandes
     */
     int val =0;
     rl_outstream = stderr;
-    char chemin[PATH_MAX+ 2]; // +2 car on affichera le dollar '$' et l'espace ' '
+    char chemin[PATH_MAX];
     chemin[0] = '\0';
-    char valeurRetour[2];
+    /*char valeurRetour[2];
     sprintf(valeurRetour,"%d",val);
     strcat(chemin,"[");
     strcat(chemin,valeurRetour);
     strcat(chemin,"]");
     strcat(chemin,path->data);
-    strcat(chemin,"$ ");
-    while ((input = readline(chemin))) {
+    strcat(chemin,"$ ");*/
+    tronquageA30Characteres(path->data,chemin,val);
+    while ((input = readline( chemin ))) {
         int len = strlen(input);
         if (len > 0) {
             //ajoute la commande à l'historique pour l'utilisation flêches directionnelles 
@@ -116,4 +116,32 @@ int main(int argc, char **argv) {
     //Pour faire un free de path
     string_delete(path);
     return 0;
+}
+
+//Tronquage du chemin à afficher à 30 charactères
+void tronquageA30Characteres(char * data, char *cheminA30Charactères, int val){
+    int len = strlen(data);
+
+    //Si la taille est bonne, on ne touche pas au chemin; le -8 est parce qu'on devra ajouter '[0]...' et '$ ' à la fin
+    if(len <= (MAX_FORMAT_STRLEN -8)) return;
+
+    //On crée le chemin à renvoyer quand la taille dépasse 30
+    cheminA30Charactères[0] = '\0';
+
+    char valeurRetour[2];
+    sprintf(valeurRetour,"%d",val);
+    strcat(cheminA30Charactères,"[");
+    strcat(cheminA30Charactères,valeurRetour);
+    strcat(cheminA30Charactères,"]");
+    strcat(cheminA30Charactères,"...");
+    strcat(cheminA30Charactères,data+(len- (MAX_FORMAT_STRLEN -8) ));
+    strcat(cheminA30Charactères,"$ ");
+
+    //memcpy(NvoChemin,chemin,3); //On copie les 3 premiers charactères ie "[0]" par exemple
+    //strcat(NvoChemin,"..."); //On ajoute les 3 points
+    //strcat(NvoChemin,chemin+(len-24)); //On colle le reste du chemin ie 24 derniers charactères
+
+
+
+
 }
