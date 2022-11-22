@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
             exitMain(tokens,size,val);   
         }
         else if(strcmp(tokens[0],"cd") == 0){
-            printf("lancement de la fonction cd\n");
+            //printf("lancement de la fonction cd\n");
             val = cd(tokens,path);
 
         }
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
             //printf("Erreur , aucune commande reconnue\n");
             val = 127;
         }
-
+        tronquageA30Characteres(path->data,chemin,val);
         // readline fait un malloc à chaque fois donc on dois le free à la fin
         free(tmp);
         free(input);
