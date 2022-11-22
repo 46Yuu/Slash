@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
         -faudra garder les valeurs de retour des return
         -Creer des dossiers test aussi pour les commandes
     */
-    int val =0;
+    int val = 0;
     rl_outstream = stderr;
     char chemin[PATH_MAX];
     chemin[0] = '\0';
@@ -93,19 +93,20 @@ int main(int argc, char **argv) {
             token = strtok(NULL, " ");
         }
         if(strcmp(tokens[0],"exit") == 0){
-            printf("lancement de la fonction exit\n");
-            return val;
+            //printf("lancement de la fonction exit\n");
+            exitMain(tokens,size,val);   
         }
         else if(strcmp(tokens[0],"cd") == 0){
-            printf("lancement de la fonction cd\n");
+            //printf("lancement de la fonction cd\n");
             val = cdTest();
         }
         else if(strcmp(tokens[0],"pwd") == 0){
-            printf("lancement de la fonction pwd\n");
-            val = pwd(tokens,size,path);
+            //printf("lancement de la fonction pwd\n");
+            val = pwd(tokens,size,path->data);
         }
         else{
-            printf("Erreur , aucune commande reconnue\n");
+            //printf("Erreur , aucune commande reconnue\n");
+            val = 127;
         }
 
         // readline fait un malloc à chaque fois donc on dois le free à la fin
@@ -119,7 +120,7 @@ int main(int argc, char **argv) {
 }
 
 //Tronquage du chemin à afficher à 30 charactères
-void tronquageA30Characteres(char * data, char *cheminA30Charactères, int val){
+void tronquageA30Characteres(char * data, char * cheminA30Charactères, int val){
     int len = strlen(data);
 
     //Si la taille est bonne, on ne touche pas au chemin; le -8 est parce qu'on devra ajouter '[0]...' et '$ ' à la fin

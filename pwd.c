@@ -5,9 +5,10 @@
 #include "pwd.h"
 #define PATH_MAX 4096
 
-int pwd(char *tokens[],int size,struct string * path){
+int pwd(char *tokens[],int size,char * path){
     char chemin [PATH_MAX +1];
-    strcat(chemin,path->data);
+    chemin[0] = '\0';
+    strcat(chemin,path);
     char buf [PATH_MAX +1];
 
     if (size >2){
@@ -15,9 +16,8 @@ int pwd(char *tokens[],int size,struct string * path){
         return 1;
     }
     else if(size ==1){
-        strcat(chemin,"\n");
-        printf("%s",chemin);//TODO chemin
-        return 0;
+        printf("%s",strcat(chemin,"\n"));//TODO chemin
+        return 1;
     }
     else {
         if(strcmp(tokens[1],"-P")==0){
@@ -28,6 +28,7 @@ int pwd(char *tokens[],int size,struct string * path){
         }
         else if(strcmp(tokens[1],"-L")==0){
             printf("option de pwd = -L\n");//TODO mettre la référence absolue logique 
+            printf("%s",strcat(chemin,"\n"));
             return 0;
         }
         else{
