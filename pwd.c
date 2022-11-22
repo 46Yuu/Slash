@@ -8,7 +8,7 @@
 
 int pwd(char *tokens[],int size,struct string * path){
     char chemin [PATH_MAX +1];
-    strcat(chemin,path->data);
+    strcpy(chemin,path->data);
     char buf [PATH_MAX +1];
 
     if(size >=1){
