@@ -35,11 +35,19 @@ int main(int argc, char **argv) {
 
     //Création et Remplissage de path par buff
     struct string * path = string_new(PATH_MAX);
+    struct string * pathBefore = string_new(PATH_MAX);
+
     if(path == NULL){
         printf("path a pas marché\n");
         return 1;
     }
+    if(pathBefore == NULL){
+        printf("pathBefore a pas marché\n");
+        return 1;
+    }
     string_append(path,buff);
+    string_append(pathBefore,buff);
+
 
     //Free du buff    
     free(buff);
@@ -65,6 +73,11 @@ int main(int argc, char **argv) {
     strcat(chemin,"$ ");*/
     tronquageA30Characteres(path->data,chemin,val);
     while ((input = readline( chemin ))) {
+
+        //On sauvegarde l'ancien chemin dans la variable pathBefore
+        string_truncate(pathBefore,strlen(pathBefore->data));
+        string_append(pathBefore,path->data);
+
         int len = strlen(input);
         if (len > 0) {
             //ajoute la commande à l'historique pour l'utilisation flêches directionnelles 
@@ -99,7 +112,7 @@ int main(int argc, char **argv) {
         }
         else if(strcmp(tokens[0],"cd") == 0){
             //printf("lancement de la fonction cd\n");
-            val = cd(tokens,path);
+            val = cd(tokens,path,pathBefore);
 
         }
         else if(strcmp(tokens[0],"pwd") == 0){
@@ -110,7 +123,10 @@ int main(int argc, char **argv) {
             //printf("Erreur , aucune commande reconnue\n");
             val = 127;
         }
+
+        //Pour mettre la variable chemin à jour
         tronquageA30Characteres(path->data,chemin,val);
+
         // readline fait un malloc à chaque fois donc on dois le free à la fin
         free(tmp);
         free(input);

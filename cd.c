@@ -9,7 +9,7 @@
 
 #define PATH_MAX 4096
 
-int cd(char *tokens[],struct string * path){
+int cd(char *tokens[],struct string * path,struct string * pathBefore){
  
 
     //les options

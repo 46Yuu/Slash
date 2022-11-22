@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
     printf("---------------------Essaie avec mystring-----------------------");
     struct string * path = string_new(PATH_MAX);
     printf("Affichage de string vide : %s\n",path->data);
-    string_append(path,"/aaa/bbb/CCC");
+    string_append(path,"/aaa/bbb/CCC/tt/t/T/TT/T/TD/D/ERGF/GTG/EZT");
     printf("Affichage de apres append : %s\n",path->data);
     string_truncate_to_slash(path);
     printf("Affichage de apres truncate : %s\n",path->data);

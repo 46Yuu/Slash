@@ -19,8 +19,8 @@ int pwd(char *tokens[],int size,char * path){
             return 0;
         }
         else {
-            printf("%s\n",chemin);
-            return 0;
+        printf("%s\n",chemin);
+        return 0;
         }
     }else return 1;
     
