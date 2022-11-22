@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "exit.h"
@@ -97,8 +98,9 @@ int main(int argc, char **argv) {
             exitMain(tokens,size,val);   
         }
         else if(strcmp(tokens[0],"cd") == 0){
-            //printf("lancement de la fonction cd\n");
-            val = cdTest();
+            printf("lancement de la fonction cd\n");
+            val = cd(tokens,path);
+
         }
         else if(strcmp(tokens[0],"pwd") == 0){
             //printf("lancement de la fonction pwd\n");
