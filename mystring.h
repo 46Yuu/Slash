@@ -7,6 +7,8 @@
 struct string {
   size_t capacity; // Taille du buffer .data
   size_t length;   // Taille de la chaîne, sans compter le \0 terminal
+  size_t lengthBefore;
+  char * dataBefore;
   char * data;     // Contenu de la chaîne, avec un \0 terminal
 };
 

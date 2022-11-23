@@ -74,10 +74,6 @@ int main(int argc, char **argv) {
     tronquageA30Characteres(path->data,chemin,val);
     while ((input = readline( chemin ))) {
 
-        //On sauvegarde l'ancien chemin dans la variable pathBefore
-        string_truncate(pathBefore,strlen(pathBefore->data));
-        string_append(pathBefore,path->data);
-
         int len = strlen(input);
         if (len > 0) {
             //ajoute la commande à l'historique pour l'utilisation flêches directionnelles 
@@ -112,7 +108,7 @@ int main(int argc, char **argv) {
         }
         else if(strcmp(tokens[0],"cd") == 0){
             //printf("lancement de la fonction cd\n");
-            val = cd(tokens,path,pathBefore);
+            val = cd(tokens,size,path);
 
         }
         else if(strcmp(tokens[0],"pwd") == 0){

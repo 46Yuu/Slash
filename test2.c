@@ -2,6 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/dir.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/dir.h>
+#include <limits.h>
+#include <string.h>
+#include <errno.h>
 
 
 
@@ -25,6 +37,21 @@ int main(int argc, char **argv) {
     printf("Now toto est  %s\n",toto);
     strcat(toto,"Bien");
     printf("Enfin toto est  %s\n",toto);
+    
+    DIR * dir = NULL;
+    if((dir =opendir("d")) == NULL){
+        printf("Pas marché");
+        closedir(dir);
+        return 1;
+    }else{
+        printf("Ca marche\n");
+        char buf[PATH_MAX];        
+        getcwd(buf,PATH_MAX);
+        printf("%s\n",buf);
+
+    }
+    closedir(dir);
+
 
 
 

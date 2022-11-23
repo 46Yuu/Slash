@@ -14,13 +14,19 @@ struct string * string_new(size_t capacity){
     } 
     s->capacity = capacity;
     s->length = 0;
-
+    s->lengthBefore = 0;
     char * data = malloc(capacity * sizeof(char));
     if(data == NULL){
         free(data);
         return NULL;
     } 
     s->data = data;
+    char * dataBefore = malloc(capacity * sizeof(char));
+    if(dataBefore == NULL){
+        free(dataBefore);
+        return NULL;
+    } 
+    s->dataBefore = dataBefore;
     return s;
 
 }
