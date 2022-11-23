@@ -143,6 +143,7 @@ void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val){
 
     //Si la taille est bonne, on ne touche pas au chemin; le -8 est parce qu'on devra ajouter '[0]...' et '$ ' à la fin
     if(len <= (MAX_FORMAT_STRLEN -8)) return;
+    printf("trunc %s\n",data);
 
     //On crée le chemin à renvoyer quand la taille dépasse 30
     cheminA30Caracteres[0] = '\0';
@@ -155,7 +156,7 @@ void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val){
     strcat(cheminA30Caracteres,"...");
     strcat(cheminA30Caracteres,data+(len- (MAX_FORMAT_STRLEN -8) ));
     strcat(cheminA30Caracteres,"$ ");
-
+    printf("fin trunc %s\n",cheminA30Caracteres);
     //memcpy(NvoChemin,chemin,3); //On copie les 3 premiers charactères ie "[0]" par exemple
     //strcat(NvoChemin,"..."); //On ajoute les 3 points
     //strcat(NvoChemin,chemin+(len-24)); //On colle le reste du chemin ie 24 derniers charactères

@@ -10,56 +10,56 @@
 #define PATH_MAX 4096
 
 int cd(char *tokens[],struct string * path,struct string * pathBefore){
- 
-
+    int i = 0;
     //les options
     if (strcmp(tokens[1],"-P")==0){
-       et: if (tokens[2] !=NULL){ // si  chemin
+        i = 2;
+        goto et;
+       et: if (tokens[i] !=NULL){ // si  chemin
             char buf [PATH_MAX +1];
-            if (strcmp(tokens[2],"-")==0){
+            char buff [PATH_MAX +1];
+            if (strcmp(tokens[i],"-")==0)
+            {
                 /* code */
             }else{
-                realpath(tokens[2],buf);//stock dans buf le chemin a partir de la racine
-                //printf("%s\n",buf);
-                if(chdir(tokens[2])==0){
+                realpath(tokens[i],buf);//stock dans buf le chemin a partir de la racine
+                printf("%s\n",buf);
+                if(chdir(tokens[i])==0){
                     string_truncate(path,strlen(path->data));
                     string_append(path,buf);
                     //strcpy(path->data,buf);
                     return 0;
                 }else{
-                    printf("Dossier inexistant\n");
-
                     return 1;
                 } 
             }         
         }else return 1;//si aucun argument apres cd -P
+
     }else{
-        int i = 1;
+        i = 1;
         if (strcmp(tokens[1],"-L")==0)
         {
             i =2;
         }
-        
         char * pwd = malloc(PATH_MAX*sizeof(char));
-        if (pwd == NULL){
-            free(pwd);
-            exit(1);
-        }
         strcpy(pwd,path->data);
         char* token = strtok(tokens[i], "/");
+
         while (token != NULL){
             if (strcmp(token,"-")==0){
                 /* code */
             }
             else if (strcmp(token,"..")==0){   
                 /* a faire */
+                if(chdir("..")!=0){
+                    return 1;
+                }
                 string_truncate_to_slash(path);
                 return 0;
             }    
             else if (strcmp(token,".")==0){
                 goto suite;/* a faire */
-            }
-            else{
+            }else{
                 if(chdir(token)==0){
                     strcat(pwd,"/");
                     strcat(pwd,token);
@@ -75,6 +75,6 @@ int cd(char *tokens[],struct string * path,struct string * pathBefore){
         return 0;
         
     }
-
+    return 1;
 }
 
