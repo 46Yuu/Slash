@@ -16,6 +16,27 @@
 #define MAX_TOKEN_NUMBER 10 //nombre maximale de tokens dans une ligne de commande
 #define PATH_MAX 4096 // taille maximale du chemin
 
+//Tronquage du chemin à afficher à 30 charactères
+void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val){
+    int len = strlen(data);
+    //printf("trunc\n");
+    cheminA30Caracteres[0] = '\0';
+    char valeurRetour[2];
+    sprintf(valeurRetour,"%d",val);
+    strcat(cheminA30Caracteres,"[");
+    strcat(cheminA30Caracteres,valeurRetour);
+    strcat(cheminA30Caracteres,"]");
+    //Si la taille est bonne, on ne touche pas au chemin; le -8 est parce qu'on devra ajouter '[0]...' et '$ ' à la fin
+    if(len <= (MAX_FORMAT_STRLEN -8)){
+        strcat(cheminA30Caracteres,data);
+        strcat(cheminA30Caracteres,"$ ");
+    }else{
+        //On crée le chemin à renvoyer quand la taille dépasse 30
+        strcat(cheminA30Caracteres,"...");
+        strcat(cheminA30Caracteres,data+(len- (MAX_FORMAT_STRLEN -8) ));
+        strcat(cheminA30Caracteres,"$ ");
+    }
+}
 
 int main(int argc, char **argv) {
     printf("------------------------Test de Make sur slash-------------\n");
@@ -53,13 +74,6 @@ int main(int argc, char **argv) {
     free(buff);
 
 
-    /* TODO: 
-        -Pour le readline, faudra afficher le repertoire courant avant le $ donc faudra une variable repertoire
-        courant qui changerea au fur et à mesure
-
-        -faudra garder les valeurs de retour des return
-        -Creer des dossiers test aussi pour les commandes
-    */
     int val = 0;
     rl_outstream = stderr;
     char chemin[PATH_MAX];
@@ -131,34 +145,4 @@ int main(int argc, char **argv) {
     //Pour faire un free de path
     string_delete(path);
     return 0;
-}
-
-//Tronquage du chemin à afficher à 30 charactères
-void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val){
-    int len = strlen(data);
-    //printf("trunc\n");
-    cheminA30Caracteres[0] = '\0';
-    char valeurRetour[2];
-    sprintf(valeurRetour,"%d",val);
-    strcat(cheminA30Caracteres,"[");
-    strcat(cheminA30Caracteres,valeurRetour);
-    strcat(cheminA30Caracteres,"]");
-    //Si la taille est bonne, on ne touche pas au chemin; le -8 est parce qu'on devra ajouter '[0]...' et '$ ' à la fin
-    if(len <= (MAX_FORMAT_STRLEN -8)){
-        strcat(cheminA30Caracteres,data);
-        strcat(cheminA30Caracteres,"$ ");
-    }else{
-        //On crée le chemin à renvoyer quand la taille dépasse 30
-        strcat(cheminA30Caracteres,"...");
-        strcat(cheminA30Caracteres,data+(len- (MAX_FORMAT_STRLEN -8) ));
-        strcat(cheminA30Caracteres,"$ ");
-    }
-    //printf("trunc %s\n",data);
-
-    
-    //printf("fin trunc %s\n",cheminA30Caracteres);
-    //memcpy(NvoChemin,chemin,3); //On copie les 3 premiers charactères ie "[0]" par exemple
-    //strcat(NvoChemin,"..."); //On ajoute les 3 points
-    //strcat(NvoChemin,chemin+(len-24)); //On colle le reste du chemin ie 24 derniers charactères
-
 }

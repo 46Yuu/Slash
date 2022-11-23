@@ -14,64 +14,67 @@
 int cd(char *tokens[],int size,struct string * path){
     //les options
     int i = 0;
+    DIR * dir = NULL;
+    char buf [PATH_MAX +1];
+    //string pwd temporaire pour garder le path d'avant les modifications avec cd , en mémoire
     char * pwd = malloc(PATH_MAX*sizeof(char));
     if(pwd == NULL){
         free(pwd);
         return 1;
     }
     strcpy(pwd,path->data);
-    DIR * dir = NULL;
-    char buf [PATH_MAX +1];
     if (strcmp(tokens[1],"-P")==0){
         i = 2;
         goto et;
         et: 
-            if (tokens[i] !=NULL){ // si  chemin
-                if (strcmp(tokens[i],"-")==0)
+            if (tokens[i] !=NULL){ // si il y a un chemin ou un "-" en parametre
+                if (strcmp(tokens[i],"-")==0) //cd -P -
                 {
-                    /* code */
+                    //code
                 }else{
-                    realpath(tokens[i],buf);//stock dans buf le chemin a partir de la racine
-                    //printf("%s\n",buf);
-                    if((dir=opendir(buf))!=NULL){
+                    //stock dans buf le chemin a partir de la racine
+                    realpath(tokens[i],buf);
+                    if((dir=opendir(buf))!=NULL){//si le dossier existe on remplace path->data par le buffer 
                         string_truncate(path,strlen(path->data));
                         string_append(path,buf);
-                        //strcpy(path->data,buf);
-                    }else{
+                    }else{ //erreur , donc on remet le string pwd du path->data de base
                         string_truncate(path,strlen(path->data));
                         string_append(path,pwd);
                         return 1;
                     } 
                 }         
             }else {
+                //cd -P 
                 string_truncate(path,strlen(path->data));
                 string_append(path,getenv("HOME"));
             }
     }else{
         i = 1;
-        if (strcmp(tokens[1],"-L")==0)
-        {
+        if (strcmp(tokens[1],"-L")==0){
             i =2;
         }
-        //printf("print 1 tokens[1]:%s\n",tokens[1]);
-        if(size >1){
-            char* token = strtok(tokens[i], "/");
+        if(size >1){//si il y a des parametres après cd 
+            //sépare le chemin a suivre en plusieurs token
+            char tokensTmp[PATH_MAX];
+            strcpy(tokensTmp,tokens[i]);
+            char* token = strtok(tokensTmp, "/");
+            //tant qu'il reste des string a suivre avec cd
             while (token != NULL){
-                //printf("print 2 token:%s\n",token);
+                //modifie le chemin actuel par celui du cd precedant gardé en mémoire
                 if (strcmp(token,"-")==0){
-                    /* code */
                     string_truncate(path,strlen(path->data));
                     string_append(path,path->dataBefore);
                 }
+                //recule de un répertoire
                 else if (strcmp(token,"..")==0){   
-                    /* a faire */
                     string_truncate_to_slash(path);
                     goto suite;
-                    //return 0;
                 }    
                 else if (strcmp(token,".")==0){
-                    goto suite;/* a faire */
+                    goto suite;
                 }else{
+                    //on vérifie si le répertoire existe
+                    //si il existe , on ajoute a la fin du chemin actuel "/" suivi du répertoire suivant et on avance dans la liste de token
                     if((dir =opendir(strcat(strcat(path->data,"/"),token)))!=NULL){
                         buf[0]= '\0';
                         strcat(buf,"/");
@@ -84,9 +87,6 @@ int cd(char *tokens[],int size,struct string * path){
                 }
                 suite :
                     token = strtok(NULL, "/");
-                    /*char tmp[PATH_MAX];        
-                    getcwd(tmp,PATH_MAX);
-                    printf("%s\n",tmp);*/
             }
         }
         else {
@@ -94,14 +94,10 @@ int cd(char *tokens[],int size,struct string * path){
             string_append(path,getenv("HOME"));
         }
     }
-    /*char tmp[PATH_MAX];        
-    getcwd(tmp,PATH_MAX);
-    printf("1 : %s\n",tmp);*/
+    //on met a jour le string correspondant au répertoire précédent
     path->dataBefore = pwd;
+    //on se déplace dans le nouveau path
     chdir(path->data);      
-    /*getcwd(tmp,PATH_MAX);
-    printf("2 :%s\n",tmp);*/
-    //strcpy(path->data,pwd);
     closedir(dir);
     return 0;
 }
