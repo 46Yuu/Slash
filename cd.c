@@ -23,7 +23,7 @@ int cd(char *tokens[],struct string * path,struct string * pathBefore){
                 /* code */
             }else{
                 realpath(tokens[i],buf);//stock dans buf le chemin a partir de la racine
-                printf("%s\n",buf);
+                //printf("%s\n",buf);
                 if(chdir(tokens[i])==0){
                     string_truncate(path,strlen(path->data));
                     string_append(path,buf);
