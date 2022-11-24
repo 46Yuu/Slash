@@ -6,27 +6,27 @@
 // Crée une nouvelle chaîne de longueur 0 et de capacité donnée, allouée
 // sur le tas (c'est-à-dire avec malloc).
 struct string * string_new(size_t capacity){
-    struct string *s;
-    s = malloc(sizeof(struct string));
+    if (capacity == 0) return NULL;
+    struct string * s =malloc(sizeof(*s));
     if(s == NULL){
         free(s);
         return NULL;
-    } 
+    }
     s->capacity = capacity;
     s->length = 0;
     s->lengthBefore = 0;
-    char * data = malloc(capacity * sizeof(char));
-    if(data == NULL){
-        free(data);
+    s->data = malloc (capacity * sizeof(char));
+    if(s->data == NULL){
+        free(s->data);
         return NULL;
-    } 
-    s->data = data;
-    char * dataBefore = malloc(capacity * sizeof(char));
-    if(dataBefore == NULL){
-        free(dataBefore);
+    }
+    s->data[0] = 0;
+    s->dataBefore = malloc (capacity * sizeof(char));
+    if(s->dataBefore == NULL){
+        free(s->dataBefore);
         return NULL;
-    } 
-    s->dataBefore = dataBefore;
+    }
+    s->dataBefore[0] = 0;
     return s;
 
 }
@@ -34,6 +34,7 @@ struct string * string_new(size_t capacity){
 // Détruit une chaîne, en libérant la mémoire occupée.
 void string_delete(struct string * str){
     free(str->data);
+    free(str->dataBefore);
     free(str);
 }
 

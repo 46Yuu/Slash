@@ -56,18 +56,11 @@ int main(int argc, char **argv) {
 
     //Création et Remplissage de path par buff
     struct string * path = string_new(PATH_MAX);
-    struct string * pathBefore = string_new(PATH_MAX);
-
     if(path == NULL){
         printf("path a pas marché\n");
         return 1;
     }
-    if(pathBefore == NULL){
-        printf("pathBefore a pas marché\n");
-        return 1;
-    }
     string_append(path,buff);
-    string_append(pathBefore,buff);
 
 
     //Free du buff    
