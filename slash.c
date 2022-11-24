@@ -71,13 +71,7 @@ int main(int argc, char **argv) {
     rl_outstream = stderr;
     char chemin[PATH_MAX];
     chemin[0] = '\0';
-    /*char valeurRetour[2];
-    sprintf(valeurRetour,"%d",val);
-    strcat(chemin,"[");
-    strcat(chemin,valeurRetour);
-    strcat(chemin,"]");
-    strcat(chemin,path->data);
-    strcat(chemin,"$ ");*/
+    //tronquage initial pour l'affichage du prompt avec 30 charactères max 
     tronquageA30Characteres(path->data,chemin,val);
     while ((input = readline( chemin ))) {
 
@@ -96,6 +90,7 @@ int main(int argc, char **argv) {
         //compte la taille du tableau de tokens avec comme séparateur " "
         int size = 0;
         char* token = strtok(tmp, " ");
+        //while du strtok copié pour connaitre le fonctionnement de strtok du site tutorialspoint
         while (token != NULL){
             size++;
             token = strtok(NULL, " ");
@@ -110,20 +105,16 @@ int main(int argc, char **argv) {
             token = strtok(NULL, " ");
         }
         if(strcmp(tokens[0],"exit") == 0){
-            //printf("lancement de la fonction exit\n");
             exitMain(tokens,size,val);   
         }
         else if(strcmp(tokens[0],"cd") == 0){
-            //printf("lancement de la fonction cd\n");
             val = cd(tokens,size,path);
 
         }
         else if(strcmp(tokens[0],"pwd") == 0){
-            //printf("lancement de la fonction pwd\n");
             val = pwd(tokens,size,path->data);
         }
         else{
-            //printf("Erreur , aucune commande reconnue\n");
             val = 127;
         }
 

@@ -2,7 +2,7 @@
 #include <string.h>
 #include "mystring.h"
 
-
+////Code provenant du TP6 avec quelques petites modifications sur la structure et ajout d'une fonction
 // Crée une nouvelle chaîne de longueur 0 et de capacité donnée, allouée
 // sur le tas (c'est-à-dire avec malloc).
 struct string * string_new(size_t capacity){

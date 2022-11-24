@@ -31,16 +31,19 @@ int cd(char *tokens[],int size,struct string * path){
                 {
                     //code
                 }else{
+                    //Cree un dir pour pouvoir utiliser opendir sur le fichier à vérifier l'existance 
                     DIR * dir = NULL;
                     //stock dans buf le chemin a partir de la racine
                     realpath(tokens[i],buf);
                     if((dir=opendir(buf))!=NULL){//si le dossier existe on remplace path->data par le buffer 
                         string_truncate(path,strlen(path->data));
                         string_append(path,buf);
+                        //fermeture du dir
                         closedir(dir);
                     }else{ //erreur , donc on remet le string pwd du path->data de base
                         string_truncate(path,strlen(path->data));
                         string_append(path,pwd);
+                        //fermeture du dir
                         closedir(dir);
                         return 1;
                     } 
@@ -86,10 +89,12 @@ int cd(char *tokens[],int size,struct string * path){
                         closedir(dir);
                         goto suite;
                     }else{
+                        //on ferme le dir
                         closedir(dir);
                         goto et;
                     }         
                 }
+                //permet d'aller sur le prochain token de la liste
                 suite :
                     token = strtok(NULL, "/");
             }
@@ -101,6 +106,7 @@ int cd(char *tokens[],int size,struct string * path){
     }
     //on met a jour le string correspondant au répertoire précédent
     strcpy(path->dataBefore,pwd);
+    //on free le pwd 
     free(pwd);
     //on se déplace dans le nouveau path
     chdir(path->data);     

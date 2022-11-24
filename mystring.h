@@ -1,6 +1,7 @@
 #ifndef MYSTRING_H
 #define MYSTRING_H
 
+//Code provenant du TP6 avec quelques petites modifications sur la structure et ajout d'une fonction
 // La structure string stocke une chaîne de caractères terminée par un \0
 // dans un buffer de taille connue, pour éviter les débordements.
 
