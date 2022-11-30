@@ -1,0 +1,4 @@
+- Fonctions pour vérifier si une commande externe existe
+- Faire l'expansion des * **
+- adaptation selon la valeur de retour
+- adapter prompt selon valeur de retour

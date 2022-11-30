@@ -8,6 +8,9 @@
 #include "pwd.h"
 #include "mystring.h"
 #include "cd.h"
+#include "cext.h"
+#include <stdbool.h>
+#include <dirent.h>
 
 
 #define MAX_ARGS_NUMBER 4096
@@ -15,6 +18,8 @@
 #define MAX_FORMAT_STRLEN 30 // taille maximale pour le formatage
 #define MAX_TOKEN_NUMBER 10 //nombre maximale de tokens dans une ligne de commande
 #define PATH_MAX 4096 // taille maximale du chemin
+#define PATH_COMMANDE_EXTERNE "/usr/bin"
+
 
 //Tronquage du chemin à afficher à 30 charactères
 void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val){
@@ -36,6 +41,45 @@ void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val){
         strcat(cheminA30Caracteres,data+(len- (MAX_FORMAT_STRLEN -8) ));
         strcat(cheminA30Caracteres,"$ ");
     }
+    //printf("trunc %s\n",data);
+
+    
+    //printf("fin trunc %s\n",cheminA30Caracteres);
+    //memcpy(NvoChemin,chemin,3); //On copie les 3 premiers charactères ie "[0]" par exemple
+    //strcat(NvoChemin,"..."); //On ajoute les 3 points
+    //strcat(NvoChemin,chemin+(len-24)); //On colle le reste du chemin ie 24 derniers charactères
+}
+
+int existCext(char *cmd){
+    printf("Lancement de la fonction\n");
+    return 1;
+}
+
+//Verifie si la commande externe existe c'est à dire si elle est dans le fichier /usr/bin
+int existenceCommandeExterne(char * cmd){
+    int retour = 0;
+    //printf("La commande est %s",cmd);
+    DIR * dir = opendir(PATH_COMMANDE_EXTERNE);
+    if(dir == NULL){
+        return -1;
+    }
+    struct dirent * entree = NULL;
+    
+
+    int compteur = 0;
+    while((entree = readdir(dir))){
+        //printf("Compteur est %d",compteur);
+
+        compteur++;
+        //printf("%s ",entree->d_name);
+        if(strcmp(entree->d_name,cmd) == 0){
+            //printf("Trouvé");
+            retour = 1;
+            break;
+        }
+    }
+
+    return retour;
 }
 
 int main(int argc, char **argv) {
@@ -56,22 +100,42 @@ int main(int argc, char **argv) {
 
     //Création et Remplissage de path par buff
     struct string * path = string_new(PATH_MAX);
+    struct string * pathBefore = string_new(PATH_MAX);
+
     if(path == NULL){
         printf("path a pas marché\n");
         return 1;
     }
+    if(pathBefore == NULL){
+        printf("pathBefore a pas marché\n");
+        return 1;
+    }
     string_append(path,buff);
+    string_append(pathBefore,buff);
 
 
     //Free du buff    
     free(buff);
 
 
+    /* TODO: 
+        -Pour le readline, faudra afficher le repertoire courant avant le $ donc faudra une variable repertoire
+        courant qui changerea au fur et à mesure
+
+        -faudra garder les valeurs de retour des return
+        -Creer des dossiers test aussi pour les commandes
+    */
     int val = 0;
     rl_outstream = stderr;
     char chemin[PATH_MAX];
     chemin[0] = '\0';
-    //tronquage initial pour l'affichage du prompt avec 30 charactères max 
+    /*char valeurRetour[2];
+    sprintf(valeurRetour,"%d",val);
+    strcat(chemin,"[");
+    strcat(chemin,valeurRetour);
+    strcat(chemin,"]");
+    strcat(chemin,path->data);
+    strcat(chemin,"$ ");*/
     tronquageA30Characteres(path->data,chemin,val);
     while ((input = readline( chemin ))) {
 
@@ -79,6 +143,7 @@ int main(int argc, char **argv) {
         if (len > 0) {
             //ajoute la commande à l'historique pour l'utilisation flêches directionnelles 
             add_history(input);
+            
         }
         //copie la commande pour pouvoir compter le nombre de cases de tokens
         char* tmp = malloc(len*sizeof(char)+1);
@@ -90,7 +155,6 @@ int main(int argc, char **argv) {
         //compte la taille du tableau de tokens avec comme séparateur " "
         int size = 0;
         char* token = strtok(tmp, " ");
-        //while du strtok copié pour connaitre le fonctionnement de strtok du site tutorialspoint
         while (token != NULL){
             size++;
             token = strtok(NULL, " ");
@@ -105,18 +169,28 @@ int main(int argc, char **argv) {
             token = strtok(NULL, " ");
         }
         if(strcmp(tokens[0],"exit") == 0){
+            //printf("lancement de la fonction exit\n");
             exitMain(tokens,size,val);   
         }
         else if(strcmp(tokens[0],"cd") == 0){
+            //printf("lancement de la fonction cd\n");
             val = cd(tokens,size,path);
 
         }
         else if(strcmp(tokens[0],"pwd") == 0){
+            //printf("lancement de la fonction pwd\n");
             val = pwd(tokens,size,path->data);
+        }else{
+            printf("Else\n");
+            if(existenceCommandeExterne(tokens[0]) == 1){
+                printf("Arrivé ICI\n");
+                val = cext(tokens,size,path);   
+
+            }
+
         }
-        else{
-            val = 127;
-        }
+            
+        
 
         //Pour mettre la variable chemin à jour
         tronquageA30Characteres(path->data,chemin,val);
@@ -130,3 +204,4 @@ int main(int argc, char **argv) {
     string_delete(path);
     return 0;
 }
+
