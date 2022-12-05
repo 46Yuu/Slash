@@ -181,10 +181,8 @@ int main(int argc, char **argv) {
             //printf("lancement de la fonction pwd\n");
             val = pwd(tokens,size,path->data);
         }else{
-            printf("Else\n");
             if(existenceCommandeExterne(tokens[0]) == 1){
-                printf("Arrivé ICI\n");
-                val = cext(tokens,size,path);   
+                val = cext(tokens,size,path,argv);   
 
             }
 
