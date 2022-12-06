@@ -88,7 +88,17 @@ int cd(char *tokens[],int size,struct string * path){
                         string_append(path,buf);
                         closedir(dir);
                         goto suite;
-                    }else{
+                    }
+                    else if (strcmp(token,"tmp")==0) {
+                        buf[0]= '\0';
+                        strcat(buf,"/");
+                        strcat(buf,token);
+                        realpath(buf,buf);
+                        string_truncate(path,strlen(path->data));
+                        string_append(path,buf);
+                        closedir(dir);
+                    }
+                    else{
                         //on ferme le dir
                         closedir(dir);
                         goto et;

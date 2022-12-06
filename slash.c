@@ -11,6 +11,7 @@
 #include "cext.h"
 #include <stdbool.h>
 #include <dirent.h>
+#include <signal.h>
 
 
 #define MAX_ARGS_NUMBER 4096
@@ -29,7 +30,14 @@ void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val){
     char valeurRetour[2];
     sprintf(valeurRetour,"%d",val);
     strcat(cheminA30Caracteres,"[");
+    if(val == 0){
+        strcat(cheminA30Caracteres,"\001\033[32m\002");
+    }
+    else {
+        strcat(cheminA30Caracteres,"\001\033[91m\002");
+    }
     strcat(cheminA30Caracteres,valeurRetour);
+    strcat(cheminA30Caracteres,"\001\033[00m\002");
     strcat(cheminA30Caracteres,"]");
     //Si la taille est bonne, on ne touche pas au chemin; le -8 est parce qu'on devra ajouter '[0]...' et '$ ' à la fin
     if(len <= (MAX_FORMAT_STRLEN -8)){
@@ -85,7 +93,8 @@ int existenceCommandeExterne(char * cmd){
 int main(int argc, char **argv) {
     printf("------------------------Test de Make sur slash-------------\n");
 
-
+    signal(SIGINT,SIG_IGN);
+    signal(SIGTERM,SIG_IGN);
     char* input;
     char * buff;
 

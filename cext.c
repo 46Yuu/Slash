@@ -27,7 +27,7 @@ int cext(char *tokens[],int size,struct string * path,char **argv){
 
 
     int res;
-    printf("--------------------------------Tout début----------------------------\n");
+    //printf("--------------------------------Tout début----------------------------\n");
 
     switch (fork())
     {
