@@ -5,13 +5,16 @@
 #include "mystring.h"
 #include <readline/readline.h>
 #include <readline/history.h>
+#include "etoile.h"
 #include "cext.h"
 #include <dirent.h>
 
 #define PATH_MAX 4096
 
-int cext(char *tokens[],int size,struct string * path,char **argv){
 
+int cext(char *tokens[],int size,struct string * path,char **argv){
+  
+//  ajout etoile
     //Pour executer une commande externe avec execvp, on a besoin d'un tableau chaine de charactères dont le premier élement est la commande à lancer 
     //et le reste du tableau est les arguments sans oublier que le tableau doit se terminer par NULL
     char *args[size+1];
@@ -20,41 +23,14 @@ int cext(char *tokens[],int size,struct string * path,char **argv){
     }
     args[size] = NULL;
 
-    /*for(int i = 0; i <= size; i++){
-        printf("args %d est %s\n",i,args[i]);
-    }*/
-    // les tests
-    //on cree un tableau de tout les arguments qui suivent la commande sans /
-    if (args[1]!=NULL){
-    char * argument = (char*) malloc(strlen(args[1])*sizeof(char));
-    strcpy(argument,args[1]);
-    size_t taille = strlen(argument);
-    char **tab = malloc(taille*sizeof(char));
-    int i =0;
-    char * strToken = strtok(argument,"/");
-    while ( strToken != NULL ) {
-            tab[i] =strToken;
-            strToken = strtok ( NULL, "/" );
-    }
-    if ((strcmp(tab[1],"**")!=0) && (strcmp(tab[taille],"*")!=0)){
-        goto ici;
-    }
-    else if (strcmp(tab[1],"**")==0){
-        
-    }else if (strcmp(tab[taille],"*.c")==0){
 
-    }
 
-    }
-   
     int res;
     printf("--------------------------------Tout début----------------------------\n");
 
-
 if (args[1]==NULL){
     
-ici:
-    switch (fork())
+   ici: switch (fork())
     {
         case -1:
             perror("fork");
@@ -80,6 +56,16 @@ ici:
     }
     return 0;
        
+}
+else {
+    for (int i = 1; i < size; i++)
+    {
+       if (strchr(args[i],"*")!=NULL){
+        char * mesfichiers[]=etoile(args[i]);
+        // concatener avec args et le donner a exec
+       }
+    }
+    
 }
     
 }
