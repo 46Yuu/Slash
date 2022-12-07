@@ -10,7 +10,7 @@
 
 #define PATH_MAX 4096
 
-int cext(char *tokens[],int size,struct string * path,char **argv){
+int cext(char *tokens[],int size,struct string * path){
 
     //Pour executer une commande externe avec execvp, on a besoin d'un tableau chaine de charactères dont le premier élement est la commande à lancer 
     //et le reste du tableau est les arguments sans oublier que le tableau doit se terminer par NULL

@@ -58,10 +58,6 @@ void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val){
     //strcat(NvoChemin,chemin+(len-24)); //On colle le reste du chemin ie 24 derniers charactères
 }
 
-int existCext(char *cmd){
-    printf("Lancement de la fonction\n");
-    return 1;
-}
 
 //Verifie si la commande externe existe c'est à dire si elle est dans le fichier /usr/bin
 int existenceCommandeExterne(char * cmd){
@@ -87,6 +83,35 @@ int existenceCommandeExterne(char * cmd){
         }
     }
 
+    return retour;
+}
+
+//On verfie si le chemin donné est correct avant d'executer la commande
+int existenceCheminVersCmdExt(char * chemin,char *cmd){
+    //printf("Arrivé ici au moins et le dossier est %s et cmd est %s\n",chemin,cmd);
+
+    int retour = 0;
+    //printf("La commande est %s",cmd);
+    DIR * dir = opendir(chemin);
+    if(dir == NULL){
+        //printf("Overture non réussi\n");
+        return -1;
+    }
+    //printf("Overture réussi\n");
+
+    struct dirent * entree = NULL;
+
+    while((entree = readdir(dir))){
+
+        //printf("%s ",entree->d_name);
+        if(strcmp(entree->d_name,cmd) == 0){
+            //printf("Trouvé\n");
+            retour = 1;
+            break;
+        }
+    }
+    
+    closedir(dir);
     return retour;
 }
 
@@ -153,6 +178,8 @@ int main(int argc, char **argv) {
             //ajoute la commande à l'historique pour l'utilisation flêches directionnelles 
             add_history(input);
             
+        }else{
+            continue;
         }
         //copie la commande pour pouvoir compter le nombre de cases de tokens
         char* tmp = malloc(len*sizeof(char)+1);
@@ -190,10 +217,92 @@ int main(int argc, char **argv) {
             //printf("lancement de la fonction pwd\n");
             val = pwd(tokens,size,path->data);
         }else{
-            if(existenceCommandeExterne(tokens[0]) == 1){
-                val = cext(tokens,size,path,argv);   
-
+            //On verifier si c'est un chemin vers une commande externe
+            int estCheminVersCmdExt = 0;
+            for(int i = 0; i < strlen(tokens[0]); i++){
+                if(tokens[0][i] == '/'){
+                    //rintf("%c trouvé à la position %d\n",tokens[0][i],i);
+                    estCheminVersCmdExt = 1;
+                    break;
+                }
             }
+
+            //Le cas où c'est un chemin vers une commande externe
+            if(estCheminVersCmdExt == 1){
+                //compte la taille du tableau de tokens[0] avec comme séparateur "/"
+                int tailleApresSeparation = 0;
+                char * tmpToken0 = malloc(strlen(tokens[0])*sizeof(char)+1);
+                char * save = malloc(strlen(tokens[0])*sizeof(char)+1);
+                char * savePourSecondTok = malloc(strlen(tokens[0])*sizeof(char)+1);
+
+
+                if(tmpToken0 == NULL){
+                    free(tmpToken0);
+                    exit(1);
+                }
+                if(save == NULL){
+                    free(save);
+                    exit(1);
+                }
+                if(savePourSecondTok == NULL){
+                    free(savePourSecondTok );
+                    exit(1);
+                }
+                strcpy(tmpToken0,tokens[0]);
+                strcpy(save,tokens[0]);
+                strcpy(savePourSecondTok,tokens[0]);
+
+                //printf("tokens  0 est %s\n",tmpToken0);
+
+                char* tok = strtok(tmpToken0, "/");
+                while (tok != NULL){
+                    tailleApresSeparation++;
+                    tok = strtok(NULL, "/");
+                }
+
+                //crée le tableau de toutes les parties du chemin de taille tailleApresSeparation 
+                //et ajoute les parties séparés par "/" dedans
+                char *tokens0[tailleApresSeparation];
+                int i =0;
+                char * tokk = strtok(savePourSecondTok, "/");
+                while (tokk != NULL){
+                    tokens0[i] = tokk;
+                    i++;
+                    tokk = strtok(NULL, "/");
+                }
+
+                //On enleve la commande a la fin du chemin et on obtient
+                //le chemin vers le dossier où est stocké la commande
+                //tailleApresSeparation - 1 est la fin du tableau c'est-à-dire là où on a la commande
+                int tailleAEnlever = strlen(tokens0[tailleApresSeparation - 1]);
+                //printf("La taille à enlever est donc %d\n",tailleAEnlever);
+                save[strlen(save) - tailleAEnlever] = '\0';
+                //printf("Enfin save est %s\n",save);
+
+                //Quand le chemin vers la commande est correcte alors on lance la commande
+                if(existenceCheminVersCmdExt(save,tokens0[tailleApresSeparation - 1]) == 1){
+                    tokens[0] = tokens0[tailleApresSeparation - 1];
+                    //printf("Bref tokens[0] est %s \n",tokens[0]);
+
+
+                    val = cext(tokens,size,path); 
+                }else{//Le cas où le chemin est incorrecte on renvoie la valeur d'erreur 1
+
+                    //val = 1;
+                }
+                free(save);
+                free(tmpToken0);
+                free(savePourSecondTok );
+
+            }//Le cas où c'est juste une commande externe
+            else if(existenceCommandeExterne(tokens[0]) == 1){
+                val = cext(tokens,size,path);   
+
+            }else{
+                //val est 1 dans tous les autres cas
+                //val = 1;
+            }
+ 
 
         }
             
@@ -209,6 +318,6 @@ int main(int argc, char **argv) {
 
     //Pour faire un free de path
     string_delete(path);
-    return 0;
+    return val;
 }
 
