@@ -8,6 +8,7 @@
 #include "pwd.h"
 #include "mystring.h"
 #include "cd.h"
+#include "etoile.h"
 #include "cext.h"
 #include <stdbool.h>
 #include <dirent.h>

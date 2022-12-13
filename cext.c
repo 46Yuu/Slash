@@ -49,7 +49,7 @@ if (args[1]==NULL){
             if(WEXITSTATUS(res) == 0)
                 return 0; 
             return WEXITSTATUS(res);
-                //write(STDOUT_FILENO,"exec ok",8);
+            //write(STDOUT_FILENO,"exec ok",8);
             //printf("................Execution terminée avec le code d'erreur %d \n",WEXITSTATUS(res));
             //exit(WEXITSTATUS(res));
             
@@ -58,14 +58,19 @@ if (args[1]==NULL){
        
 }
 else {
+    char ** fichiers = malloc(PATH_MAX*sizeof(char *));
     for (int i = 1; i < size; i++)
     {
-       if (strchr(args[i],"*")!=NULL){
-        char * mesfichiers[]=etoile(args[i]);
+       if (strchr(args[i],'*')!=NULL){
+        char ** fichiers=etoile(args[i],i);
+        strcat(strcat(args[i-1],fichiers),args[i+1]);
+        goto ici;
         // concatener avec args et le donner a exec
        }
     }
+    free(fichiers);
     
 }
+
     
 }

@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -c
 
-all: mystring exit cd pwd cext slash run 
+all: mystring exit cd pwd cext etoile slash run 
 
 mystring : mystring.c
 	$(CC) $(CFLAGS) mystring.c
@@ -21,8 +21,11 @@ slash: slash.c
 cext: cext.c
 	$(CC) $(CFLAGS) cext.c 
 
+cext: etoile.c
+	$(CC) $(CFLAGS) etoile.c
+
 run: slash.c
-	$(CC) mystring.o exit.o cd.o pwd.o cext.o slash.o -o slash -lreadline 
+	$(CC) mystring.o exit.o cd.o pwd.o  etoile.o cext.o  slash.o -o slash -lreadline 
 
 clean: 
-	$(RM) slash.o mystring.o exit.o cd.o pwd.o cext.o slash
+	$(RM) slash.o mystring.o exit.o cd.o pwd.o etoile.o cext.o slash
