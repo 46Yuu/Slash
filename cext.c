@@ -28,9 +28,9 @@ int cext(char *tokens[],int size,struct string * path,char **argv){
     int res;
     printf("--------------------------------Tout début----------------------------\n");
 
-if (args[1]==NULL){
+
     
-   ici: switch (fork())
+switch (fork())
     {
         case -1:
             perror("fork");
@@ -57,20 +57,4 @@ if (args[1]==NULL){
     return 0;
        
 }
-else {
-    char ** fichiers = malloc(PATH_MAX*sizeof(char *));
-    for (int i = 1; i < size; i++)
-    {
-       if (strchr(args[i],'*')!=NULL){
-        char ** fichiers=etoile(args[i],i);
-        strcat(strcat(args[i-1],fichiers),args[i+1]);
-        goto ici;
-        // concatener avec args et le donner a exec
-       }
-    }
-    free(fichiers);
     
-}
-
-    
-}

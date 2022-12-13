@@ -25,7 +25,7 @@ cext: etoile.c
 	$(CC) $(CFLAGS) etoile.c
 
 run: slash.c
-	$(CC) mystring.o exit.o cd.o pwd.o  etoile.o cext.o  slash.o -o slash -lreadline 
+	$(CC) mystring.o exit.o cd.o pwd.o etoile.o cext.o slash.o -o slash -lreadline 
 
 clean: 
 	$(RM) slash.o mystring.o exit.o cd.o pwd.o etoile.o cext.o slash

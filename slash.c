@@ -83,13 +83,14 @@ int existenceCommandeExterne(char * cmd){
     return retour;
 }
 
+
 int main(int argc, char **argv) {
     printf("------------------------Test de Make sur slash-------------\n");
 
 
     char* input;
     char * buff;
-
+    char * repcourant =malloc(PATH_MAX*sizeof(char));
     buff = malloc(4096*sizeof(char));
 
     if(buff == NULL){
@@ -183,7 +184,26 @@ int main(int argc, char **argv) {
             val = pwd(tokens,size,path->data);
         }else{
             if(existenceCommandeExterne(tokens[0]) == 1){
-                val = cext(tokens,size,path,argv);   
+                for (int i=0;i<= size;i++){
+                    if(strstr(tokens[i],"*")){               
+                         repcourant = getcwd("repcourant",PATH_MAX*sizeof(char));
+                         int nb_argv = 0;
+                         int nbArgumments = 0;
+                         char ** argv = malloc(PATH_MAX*(sizeof(char *)));
+                         char ** patherne = parse_path(tokens[i],&nbArgumments,"/");
+                        argv = etoile(patherne,size,repcourant,argv,&nb_argv); 
+                         if (argv !=NULL){
+                            for(int i= 0;i<nb_argv;i++){
+                                printf("%s",argv[i]);
+                            }
+                         }
+                        // free(tokens);
+                         free(argv);
+                         free(patherne);
+
+                    }
+                    }   
+                    // val = cext(tokens,size,path);
 
             }
 
@@ -197,6 +217,7 @@ int main(int argc, char **argv) {
         // readline fait un malloc à chaque fois donc on dois le free à la fin
         free(tmp);
         free(input);
+        free(repcourant);
     }
 
     //Pour faire un free de path
