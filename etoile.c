@@ -41,9 +41,6 @@ int etoile(char ** args, int  * size, char * chemin){
     char * buf = malloc(PATH_MAX*sizeof(char));
     memset(buf,0,sizeof(char)*PATH_MAX);
 
-    char * extention = malloc(PATH_MAX*sizeof(char));
-    memset(extention,0,sizeof(char)*PATH_MAX);
-
     DIR * dir = NULL;
     struct dirent * entry = NULL;
     struct  stat st;
@@ -72,7 +69,6 @@ int etoile(char ** args, int  * size, char * chemin){
           }
           if(stat(buf,&st)==-1){
             goto error;
-            exit(1);
           }
           
           char tmp_dname [1] = "";        // le premier caractere des noms  de fichiers
@@ -85,7 +81,7 @@ int etoile(char ** args, int  * size, char * chemin){
                 (*nb_argv)++;
             }
           }else{// cdm *.extention
-             extention = args[k];
+             char * extention = args[k];
              strtok(extention,"*"); // recuperer l"extention si y en a pour la commparer avec la fin de tous les fichiers
              if((strcmp(tmp_dname,".")!=0)&&(suffix(extention,entry->d_name)==1)){    
                 argv[*nb_argv]=malloc(PATH_MAX*sizeof(char));
@@ -97,47 +93,46 @@ int etoile(char ** args, int  * size, char * chemin){
     }
     else{ // size >1 cas ou y a un chemin exemple a/*/b 
          if (strcmp(args[k],"*")==0){ // cas ou le repertoire contient etoile (on tombe sur * dans le parcours du chemin)
-             extention = args[k];
-            strtok(extention,"*"); // recuperer l"extention pour la commparer avec la fin de tous les fichiers
+            char * extention = args[k];
+            strtok(extention,"*"); // recuperer l"extention si y'en a pour la commparer avec la fin de tous les fichiers
             size --;
             args=&args[k+1];
             while ((entry=readdir(dir)))
             {
                 if(strcmp(chemin,"")!=0){
-                    sprintf(buf,"%s/%s",chemin,entry->d_name); // on stock le chemin et le noms de fichier trouver dans buf
-                } else{
+                    sprintf(buf,"%s/%s",chemin,entry->d_name); // on stock dans buf
                     printf(buf,"%s",entry->d_name); }
                 if(stat(buf,&st)==-1){
                      goto error;
-                      exit(1);
                  }
                 char tmp_dname [1] = "";
                 tmp_dname[0] = entry->d_name[0];// le premier caractere des noms  de fichiers
 
-                if(S_ISDIR(st.st_mode)&&(strcmp(tmp_dname,".")!=0)&&(suffix(extention,entry->d_name)==1)){
-                    etoile(args,size,chemin);
+                if(S_ISDIR(st.st_mode)&&(strcmp(tmp_dname,".")!=0)){
+                    if((suffix(extention,entry->d_name)==1)){
+                    etoile(args,size,buf); // recursion sur le nouveau rep
+                }
                 }
             }
-        }else{//le rep n'a pas de etoile dedans (on est dans a ou b )
+        }
+        else{//le rep n'a pas de etoile dedans (on est dans a ou b )
             if((strcmp(chemin,"")!=0) && (strcmp(chemin,"/")!=0)){
                 strncat(chemin,"/",2);
-            }
-            strncat(extention,args[k],strlen(args[k]));
-            closedir(dir);
+            }// on mets a jour le chemin de rep a ouvrir
+            strncat(chemin,args[k],strlen(args[k]));
+            closedir(dir);// fermuture de l'actuel
             size --;
-            k++;
-            goto ici;      
-        }           
+            k++; // avancer dans les args au nouveau rep 
+            goto ici;     
+        }          
     }
     closedir(dir);
     free(buf);
-    free(extention);
     return 0;  
 
     error : {
     perror("stat"); 
     free(buf);
-    free(extention);
     return 1; 
     }
       
