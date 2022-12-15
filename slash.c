@@ -8,6 +8,7 @@
 #include "pwd.h"
 #include "mystring.h"
 #include "cd.h"
+#include "etoile.h"
 #include "cext.h"
 #include <stdbool.h>
 #include <dirent.h>
@@ -85,6 +86,54 @@ int existenceCommandeExterne(char * cmd){
 
     return retour;
 }
+// separe la chaine selon le separateur
+char ** tokage(char * chaineASeparer,char separateur,int * taille){
+
+    char  tmpSeparateur[1]="";
+    tmpSeparateur[0]=separateur;
+    int len = strlen(chaineASeparer);
+  //copie la commande pour pouvoir compter le nombre de cases de tokens
+        char* tmp = malloc(len*sizeof(char)+1);
+        if(tmp == NULL){
+            free(tmp);
+            exit(1);
+        }
+        strcpy(tmp, chaineASeparer);
+        //compte la taille du tableau de tokens avec comme séparateur " "
+        int size = 0;
+        char* token = strtok(tmp,tmpSeparateur);
+        while (token != NULL){
+            size++;
+            token = strtok(NULL,tmpSeparateur);
+        }
+        //crée le tableau de tokens de taille size et ajoute les tokens séparés par " " dedans
+
+        char**tokens = malloc(size*sizeof(char*)+1);
+        if(tokens == NULL){
+            free(tokens);
+            exit(1);
+        }
+        int i =0;
+        token = strtok(chaineASeparer, tmpSeparateur);
+        while (token != NULL){
+            tokens[i] =malloc(strlen(token)*sizeof(char)+1);
+            if( tokens[i]== NULL){
+                free(tokens[i]);
+                exit(1);
+            }
+            tokens[i] = token;
+            i++;
+            token = strtok(NULL, tmpSeparateur);
+        }  
+        free(tmp);
+
+        *taille = size;
+        //printf("juste ici !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+
+        return tokens;
+        
+}
+
 
 //On verfie si le chemin donné est correct avant d'executer la commande
 int existenceCheminVersCmdExt(char * chemin,char *cmd){
@@ -122,7 +171,6 @@ int main(int argc, char **argv) {
     signal(SIGTERM,SIG_IGN);
     char* input;
     char * buff;
-
     buff = malloc(4096*sizeof(char));
 
     if(buff == NULL){
@@ -296,12 +344,32 @@ int main(int argc, char **argv) {
 
             }//Le cas où c'est juste une commande externe
             else if(existenceCommandeExterne(tokens[0]) == 1){
-                val = cext(tokens,size,path);   
+                 if (size >1){
+                    for (int i=0;i<= size;i++){
+                     if(strstr(tokens[i],"*")){  
+                        char * repEtoile =malloc(PATH_MAX*sizeof(char));
+                        memset(repEtoile,0,PATH_MAX*sizeof(char));  
+                        int t = 0;
+                        int * taillePatherne = &t;
+                        char ** patherne = tokage(tokens[i],'/',taillePatherne);
+                        /*printf("taille est %d\n",*taillePatherne);
+                        for(int i=0;i< *taillePatherne;i++){
+                            printf("%s\n",patherne[i]);
+                         }*/
+                        etoile(patherne,taillePatherne,repEtoile); 
+                        free(patherne);
+                        free(repEtoile);
+                     }  
+                    }
+                }else { 
 
-            }else{
+                    // val = cext(tokens,size,path);
+                }   
+
+            }/*else{
                 //val est 1 dans tous les autres cas
                 //val = 1;
-            }
+            }*/
  
 
         }
@@ -314,6 +382,7 @@ int main(int argc, char **argv) {
         // readline fait un malloc à chaque fois donc on dois le free à la fin
         free(tmp);
         free(input);
+ 
     }
 
     //Pour faire un free de path
