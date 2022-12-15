@@ -21,7 +21,7 @@ slash: slash.c
 cext: cext.c
 	$(CC) $(CFLAGS) cext.c 
 
-cext: etoile.c
+etoile: etoile.c
 	$(CC) $(CFLAGS) etoile.c
 
 run: slash.c

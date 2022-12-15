@@ -1,4 +1,4 @@
 #ifndef etoile_H
 #define etoile_H
-char ** etoile(char ** args, int size, struct string * path,char **argv,int * nb_argv);
+int etoile(char ** args, int * size, char * path);
 #endif // etoile_H
