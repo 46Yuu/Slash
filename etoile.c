@@ -11,6 +11,7 @@
 #include "etoile.h"
 
 #define PATH_MAX 4096
+#define MAX_TAILLE_NOM_FICHIER 50
 
 
   /**
@@ -29,10 +30,12 @@
      * size -> la taille de se tableau
      * chemin -> c'est le rep ou se trouve etoile sois dans le courant sois apres un deplacement
      */
-int etoile(char ** args, int  * size, char * chemin){
+int etoile(char ** args, int * size, char * chemin,char ** argv,int *nb_argv){
 
 
     //variables
+    printf("NB ARGV  est %d\n",*nb_argv);
+
 
     int k =0;
     char * repCourant = malloc(PATH_MAX*sizeof(char));
@@ -45,8 +48,8 @@ int etoile(char ** args, int  * size, char * chemin){
     struct dirent * entry = NULL;
     struct  stat st;
 
-    int *nb_argv = 0;   
-    char ** argv = malloc(PATH_MAX*(sizeof(char *)));// argv -> tableau pour stocker les fichiers trouver
+    // int *nb_argv = 0;   
+    // char ** argv = malloc(PATH_MAX*(sizeof(char *)));// argv -> tableau pour stocker les fichiers trouver
 
    ici: if(strcmp(chemin,"")==0){
       dir=opendir(repCourant);
@@ -65,19 +68,30 @@ int etoile(char ** args, int  * size, char * chemin){
             sprintf(buf,"%s/%s",chemin,entry->d_name); // on stock le chemin et le noms de fichier trouver dans buf
           }
           else{
-            printf(buf,"%s",entry->d_name); 
+            //printf("Arrivé au else\n");
+            sprintf(buf,"%s",entry->d_name); 
+            ///printf("buf est %s\n",buf);
+
           }
-          if(stat(buf,&st)==-1){
-            goto error;
-          }
-          
+        //   if(stat(buf,&st)==-1){
+        //     printf("Le stat a pas marché");
+        //     goto error;
+        //   }
           char tmp_dname [1] = "";        // le premier caractere des noms  de fichiers
           tmp_dname[0] = entry->d_name[0];// pour comparer avec les dossier cacher caractere .
 
+
           if(strcmp(args[k],"*")==0){ // cmd * 
             if ((strcmp(tmp_dname,".")!=0)){
-                argv[*nb_argv]=malloc(PATH_MAX*sizeof(char)); 
+                //tokens[i] =malloc(strlen(token)*sizeof(char)+1);
+                argv[*nb_argv]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
+                if(argv[*nb_argv] == NULL){
+                    printf("Malloc a pas marché");
+                    free(argv[*nb_argv]);
+                    return 0;                        
+                }
                 sprintf(argv[*nb_argv],"%s",buf); // on mets le contenu de buf dans le tableaux
+                printf("-------------- ici\n");
                 (*nb_argv)++;
             }
           }else{// cdm *.extention
@@ -110,7 +124,7 @@ int etoile(char ** args, int  * size, char * chemin){
 
                 if(S_ISDIR(st.st_mode)&&(strcmp(tmp_dname,".")!=0)){
                     if((suffix(extention,entry->d_name)==1)){
-                    etoile(args,size,buf); // recursion sur le nouveau rep
+                    etoile(args,size,buf,argv,nb_argv); // recursion sur le nouveau rep
                 }
                 }
             }
@@ -128,12 +142,12 @@ int etoile(char ** args, int  * size, char * chemin){
     }
     closedir(dir);
     free(buf);
-    return 0;  
+    return 1;  
 
     error : {
     perror("stat"); 
     free(buf);
-    return 1; 
+    return 0; 
     }
       
    
