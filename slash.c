@@ -343,23 +343,23 @@ int main(int argc, char **argv) {
                 free(savePourSecondTok );
 
             }//Le cas où c'est juste une commande externe
-            else if(existenceCommandeExterne(tokens[0]) == 1){
+            /*else if(existenceCommandeExterne(tokens[0]) == 1){
                  if (size >1){
                     for (int i=0;i<= size;i++){
-                     if(strstr(tokens[i],"*")){  
-                        char * repEtoile =malloc(PATH_MAX*sizeof(char));
-                        memset(repEtoile,0,PATH_MAX*sizeof(char));  
-                        int t = 0;
-                        int * taillePatherne = &t;
-                        char ** patherne = tokage(tokens[i],'/',taillePatherne);
-                        /*printf("taille est %d\n",*taillePatherne);
-                        for(int i=0;i< *taillePatherne;i++){
-                            printf("%s\n",patherne[i]);
-                         }*/
-                        etoile(patherne,taillePatherne,repEtoile); 
-                        free(patherne);
-                        free(repEtoile);
-                     }  
+                        if(strstr(tokens[i],"*")){  
+                            char * repEtoile =malloc(PATH_MAX*sizeof(char));
+                            memset(repEtoile,0,PATH_MAX*sizeof(char));  
+                            int t = 0;
+                            int * taillePatherne = &t;
+                            char ** patherne = tokage(tokens[i],'/',taillePatherne);
+                            //printf("taille est %d\n",*taillePatherne);
+                            //for(int i=0;i< *taillePatherne;i++){
+                            //    printf("%s\n",patherne[i]);
+                            //}
+                            etoile(patherne,taillePatherne,repEtoile); 
+                            free(patherne);
+                            free(repEtoile);
+                        }  
                     }
                 }else { 
 
@@ -370,6 +370,9 @@ int main(int argc, char **argv) {
                 //val est 1 dans tous les autres cas
                 //val = 1;
             }*/
+            else{
+                val = cext(tokens,size,path);
+            }
  
 
         }
