@@ -34,7 +34,6 @@ int etoile(char ** args, int * size, char * chemin,char ** argv,int *nb_argv){
 
 
     //variables
-    printf("NB ARGV  est %d\n",*nb_argv);
 
 
     int k =0;
@@ -73,10 +72,10 @@ int etoile(char ** args, int * size, char * chemin,char ** argv,int *nb_argv){
             ///printf("buf est %s\n",buf);
 
           }
-        //   if(stat(buf,&st)==-1){
-        //     printf("Le stat a pas marché");
-        //     goto error;
-        //   }
+          if(stat(buf,&st)==-1){
+            printf("Le stat a pas marché\n");
+            goto error;
+          }
           char tmp_dname [1] = "";        // le premier caractere des noms  de fichiers
           tmp_dname[0] = entry->d_name[0];// pour comparer avec les dossier cacher caractere .
 
@@ -86,19 +85,29 @@ int etoile(char ** args, int * size, char * chemin,char ** argv,int *nb_argv){
                 //tokens[i] =malloc(strlen(token)*sizeof(char)+1);
                 argv[*nb_argv]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
                 if(argv[*nb_argv] == NULL){
-                    printf("Malloc a pas marché");
+                    printf("Malloc a pas marché\n");
                     free(argv[*nb_argv]);
-                    return 0;                        
+                    goto error;
+                        
                 }
                 sprintf(argv[*nb_argv],"%s",buf); // on mets le contenu de buf dans le tableaux
-                printf("-------------- ici\n");
                 (*nb_argv)++;
             }
           }else{// cdm *.extention
-             char * extention = args[k];
-             strtok(extention,"*"); // recuperer l"extention si y en a pour la commparer avec la fin de tous les fichiers
-             if((strcmp(tmp_dname,".")!=0)&&(suffix(extention,entry->d_name)==1)){    
-                argv[*nb_argv]=malloc(PATH_MAX*sizeof(char));
+
+            char * extention = args[k];
+            strtok(extention,"*"); // recuperer l"extention si y en a pour la commparer avec la fin de tous les fichiers
+            //printf("extension est %s\n",extention+1);
+            //printf("tmpdname est %s\n",tmp_dname);
+             if((strcmp(tmp_dname,".")!=0)&&(suffix(extention+1,entry->d_name)==1)){  
+                //printf("Enfin dans le if\n");
+                argv[*nb_argv]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
+                if(argv[*nb_argv] == NULL){
+                    printf("Malloc a pas marché\n");
+                    free(argv[*nb_argv]);
+                    goto error;
+                                           
+                }
                 sprintf(argv[*nb_argv],"%s",buf); // on mets le contenu de buf dans le tableaux
                 (*nb_argv)++; 
                 }
@@ -142,6 +151,8 @@ int etoile(char ** args, int * size, char * chemin,char ** argv,int *nb_argv){
     }
     closedir(dir);
     free(buf);
+    
+    //printf("Fin etoile extension\n");
     return 1;  
 
     error : {

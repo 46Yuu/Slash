@@ -351,7 +351,7 @@ int main(int argc, char **argv) {
 
                         
                         
-                        for(int i = 0; i < MAX_TOKEN_ETOILE; i++){
+                        for(int i = 0; i < nb_argv; i++){
                             free(argv[i]);
                         }
                         free(argv);
@@ -447,44 +447,18 @@ int main(int argc, char **argv) {
                 free(tmpToken0);
                 free(savePourSecondTok );
 
-            }//Le cas où c'est juste une commande externe
-            /*else if(existenceCommandeExterne(tokens[0]) == 1){
-                 if (size >1){
-                    for (int i=0;i<= size;i++){
-                        if(strstr(tokens[i],"*")){  
-                            char * repEtoile =malloc(PATH_MAX*sizeof(char));
-                            memset(repEtoile,0,PATH_MAX*sizeof(char));  
-                            int t = 0;
-                            int * taillePatherne = &t;
-                            char ** patherne = tokage(tokens[i],'/',taillePatherne);
-                            //printf("taille est %d\n",*taillePatherne);
-                            //for(int i=0;i< *taillePatherne;i++){
-                            //    printf("%s\n",patherne[i]);
-                            //}
-                            etoile(patherne,taillePatherne,repEtoile); 
-                            free(patherne);
-                            free(repEtoile);
-                        }  
-                    }
-                }else { 
-
-                    // val = cext(tokens,size,path);
-                }   
-
-            }/*else{
-                //val est 1 dans tous les autres cas
-                //val = 1;
-            }*/
-
+            }
             //Si ce n'est pas un chemin vers une commande externe c'est à dire que c'est juste une commande externe
             else{
+                //printf("Avant Chemin normal\n");
                 if (il_ya_eu_etoile) val = cext(tokens_avec_fichiers_etoile,nb_arg_tokens_avec_fichiers_etoile,path); 
                 else val = cext(tokens,size,path); 
+                //printf("Apres Chemin normal\n");
 
             }
 
             //On free le tableau avec les fichiers etoiles
-            for(int i = 0; i < MAX_ARGS_NUMBER; i++){
+            for(int i = 0; i < nb_arg_tokens_avec_fichiers_etoile; i++){
                 free(tokens_avec_fichiers_etoile[i]);
             }
             free(tokens_avec_fichiers_etoile);
