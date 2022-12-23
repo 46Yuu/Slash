@@ -267,13 +267,12 @@ int main(int argc, char **argv) {
             //printf("lancement de la fonction pwd\n");
             val = pwd(tokens,size,path->data);
         }else{
-
-            //
-            
+            //Cas des commandes externes
+            //On verfie au debut si il y'a étoiles dans les arguments et si oui
+            //On cree un nouveau tableau token avec les anciens arguments de token
+            //puis la partie où il y avait étoile remplacé par les fichiers trouvé
             int nb_arg_tokens_avec_fichiers_etoile = 0;
-            //char *tokens_avec_fichiers_etoile[MAX_ARGS_NUMBER];
             char **tokens_avec_fichiers_etoile = malloc(sizeof(char*[MAX_ARGS_NUMBER]));
-            //char **argv = malloc(sizeof(char*[MAX_TOKEN_ETOILE]));
             int il_ya_eu_etoile = 0;
             if (size >1){
                 for (int i=0;i< size;i++){
@@ -296,16 +295,9 @@ int main(int argc, char **argv) {
                             free(argv);
                             return val;                        
                         }
-                        // for(int i = 0; i < MAX_TOKEN_ETOILE; i++){
-                        //     argv[i] = malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1);
-                        // }
-                        //char ** argv = malloc(MAX_ARGS_NUMBER*(sizeof(char *))+1);
+
                         int result = etoile(patherne,taillePatherne,repEtoile,argv,p_nb_argv);
-                        // printf("Result est %d\n",result);
-                        // printf("Taille argv est %d\n",nb_argv);
-                        // for(int i=0;i< nb_argv;i++){
-                        //    printf("%s\n",argv[i]);
-                        // }
+
 
                         //On copie jusqu'a i les élements de tokens
                         for(int j = 0;j< i;j++){
@@ -328,8 +320,7 @@ int main(int argc, char **argv) {
                                 return 0;                        
                             }
                             sprintf(tokens_avec_fichiers_etoile[j],"%s",argv[k]);
-                            //strcpy(tokens_avec_fichiers_etoile[j],argv[k]);
-                            //tokens_avec_fichiers_etoile[j] = argv[k];
+
                         }
 
                         //Enfin on copie le reste de ce qu'il yavait dans tokens a partir de i
@@ -341,8 +332,7 @@ int main(int argc, char **argv) {
                                 return 0;                        
                             }
                             sprintf(tokens_avec_fichiers_etoile[j],"%s",tokens[k]);
-                            //strcpy(tokens_avec_fichiers_etoile[j],tokens[k]);
-                            //tokens_avec_fichiers_etoile[j] = tokens[k];
+
                         }
 
                         //On met à jour la taille du tableau contenant la commande et les fichiers etoiles
@@ -350,7 +340,7 @@ int main(int argc, char **argv) {
                         il_ya_eu_etoile = 1;
 
                         
-                        
+                        //On libére le tableau argv et les autres pointeur qu'on utilisera plus
                         for(int i = 0; i < nb_argv; i++){
                             free(argv[i]);
                         }
@@ -361,7 +351,7 @@ int main(int argc, char **argv) {
                     }  
                 }
             }
-            // printf("fichers etoile %d\n",nb_arg_tokens_avec_fichiers_etoile);
+            // printf("Fichers etoile %d\n",nb_arg_tokens_avec_fichiers_etoile);
             // for(int i=0;i< nb_arg_tokens_avec_fichiers_etoile;i++){
             //    printf("%s\n",tokens_avec_fichiers_etoile[i]);
             // }

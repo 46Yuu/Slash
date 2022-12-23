@@ -29,6 +29,8 @@
      * args -> le token ou y'a l'etoile sous forme d'un tableau sans /
      * size -> la taille de se tableau
      * chemin -> c'est le rep ou se trouve etoile sois dans le courant sois apres un deplacement
+     * argv -> c'est le tableau pour stocker les fichiers trouvé
+     * nb_argv -> c'est la taille du tableau pour stocker les fichiers, 0 au depart
      */
 int etoile(char ** args, int * size, char * chemin,char ** argv,int *nb_argv){
 
@@ -82,7 +84,7 @@ int etoile(char ** args, int * size, char * chemin,char ** argv,int *nb_argv){
 
           if(strcmp(args[k],"*")==0){ // cmd * 
             if ((strcmp(tmp_dname,".")!=0)){
-                //tokens[i] =malloc(strlen(token)*sizeof(char)+1);
+                
                 argv[*nb_argv]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
                 if(argv[*nb_argv] == NULL){
                     printf("Malloc a pas marché\n");
@@ -97,9 +99,8 @@ int etoile(char ** args, int * size, char * chemin,char ** argv,int *nb_argv){
 
             char * extention = args[k];
             strtok(extention,"*"); // recuperer l"extention si y en a pour la commparer avec la fin de tous les fichiers
-            //printf("extension est %s\n",extention+1);
-            //printf("tmpdname est %s\n",tmp_dname);
-             if((strcmp(tmp_dname,".")!=0)&&(suffix(extention+1,entry->d_name)==1)){  
+
+            if((strcmp(tmp_dname,".")!=0)&&(suffix(extention+1,entry->d_name)==1)){  
                 //printf("Enfin dans le if\n");
                 argv[*nb_argv]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
                 if(argv[*nb_argv] == NULL){
