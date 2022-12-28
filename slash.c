@@ -274,18 +274,21 @@ int main(int argc, char **argv) {
             int nb_arg_tokens_avec_fichiers_etoile = 0;
             char **tokens_avec_fichiers_etoile = malloc(sizeof(char*[MAX_ARGS_NUMBER]));
             int il_ya_eu_etoile = 0;
+            int compteur_etoile = 0;
             if (size >1){
                 for (int i=0;i< size;i++){
-                    if(strstr(tokens[i],"*")){  
+                    if(strstr(tokens[i],"*")){ 
+                        nb_arg_tokens_avec_fichiers_etoile = size;
+                        compteur_etoile ++;
                         char * repEtoile =malloc(PATH_MAX*sizeof(char));
                         memset(repEtoile,0,PATH_MAX*sizeof(char));  
                         int t = 0;
                         int * taillePatherne = &t;
                         char ** patherne = tokage(tokens[i],'/',taillePatherne);
-                        // printf("taille est %d\n",*taillePatherne);
+                        // printf("taille esttttttttttttt %d\n",*taillePatherne);
                         // for(int i=0;i< *taillePatherne;i++){
-                        //    printf("%s\n",patherne[i]);
-                        // }
+                          //  printf("%s\n",patherne[i]);
+                       // }
                         
                         int nb_argv = 0;
                         int *p_nb_argv = &nb_argv;
@@ -300,7 +303,7 @@ int main(int argc, char **argv) {
 
 
                         //On copie jusqu'a i les élements de tokens
-                        for(int j = 0;j< i;j++){
+                        for(int j = 0;j < i;j++){
                             tokens_avec_fichiers_etoile[j]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
                             if(tokens_avec_fichiers_etoile[j] == NULL){
                                 printf("Malloc a pas marché");
@@ -336,8 +339,9 @@ int main(int argc, char **argv) {
                         }
 
                         //On met à jour la taille du tableau contenant la commande et les fichiers etoiles
-                        nb_arg_tokens_avec_fichiers_etoile = size + nb_argv - 1;
-                        il_ya_eu_etoile = 1;
+                        nb_arg_tokens_avec_fichiers_etoile = nb_arg_tokens_avec_fichiers_etoile + nb_argv;
+                        il_ya_eu_etoile = compteur_etoile;
+                        //printf("Fichers etoile %d\n",nb_arg_tokens_avec_fichiers_etoile);
 
                         
                         //On libére le tableau argv et les autres pointeur qu'on utilisera plus
@@ -350,8 +354,10 @@ int main(int argc, char **argv) {
                         break;
                     }  
                 }
+                nb_arg_tokens_avec_fichiers_etoile = nb_arg_tokens_avec_fichiers_etoile - il_ya_eu_etoile;
+
             }
-            // printf("Fichers etoile %d\n",nb_arg_tokens_avec_fichiers_etoile);
+            //printf("Fichers etoile %d\n",nb_arg_tokens_avec_fichiers_etoile);
             // for(int i=0;i< nb_arg_tokens_avec_fichiers_etoile;i++){
             //    printf("%s\n",tokens_avec_fichiers_etoile[i]);
             // }
