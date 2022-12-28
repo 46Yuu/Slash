@@ -74,7 +74,9 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
     if (size == 1)  //CAS  cmd *.extention \ cmd * sur le rep courant ou arriver au dernier * de la chaine 
     {
         while ((entry=readdir(dir)))
-        {
+        { 
+          
+
           if(strcmp(chemin,"")!=0){
             sprintf(buf,"%s/%s",chemin,entry->d_name); // on stock le chemin et le noms de fichier trouver dans buf
           }
@@ -128,7 +130,8 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
                 sprintf(argv[*nb_argv],"%s",buf); // on mets le contenu de buf dans le tableau
                 (*nb_argv)++; 
             }
-         }   
+         } 
+              
         }
     }
     else{ // size >1 cas ou y a un chemin exemple a/*/b 
@@ -147,8 +150,10 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
              //k++;
              args=&args[k+1];
              size --;
+
              while ((entry=readdir(dir)))
              {
+
                 if(strcmp(chemin,"")!=0){
                     sprintf(buf,"%s/%s",chemin,entry->d_name); // on stock dans buf
                    } 
@@ -167,6 +172,7 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
                  etoile(args,&size,buf,argv,nb_argv); // recursion sur le nouveau rep
                    
                 }
+             
              }
                 
             }  
@@ -198,14 +204,12 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
                     
                      etoile(args,&size,buf,argv,nb_argv); // recursion sur le nouveau rep
                     }
-                }
+                } 
+             
              }
             }
-            
-         
         }
-    
-        else {//le rep n'a pas de etoile dedans (on est dans a ou b )
+         else {//le rep n'a pas de etoile dedans (on est dans a ou b )
         // on mets a jour le chemin de rep a ouvrir
             if((strcmp(chemin,"")!=0)) strcat(chemin,"/"); 
             
@@ -228,6 +232,7 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
 
     error : {
     perror("erreur"); 
+    closedir(dir);
     free(buf);
     return 1; 
     }

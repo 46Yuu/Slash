@@ -283,8 +283,11 @@ int main(int argc, char **argv) {
                         char * repEtoile =malloc(PATH_MAX*sizeof(char));
                         memset(repEtoile,0,PATH_MAX*sizeof(char));  
                         int t = 0;
+                        //int result = 3;
+                        //printf("resultat de result %d\n",result);
                         int * taillePatherne = &t;
                         char ** patherne = tokage(tokens[i],'/',taillePatherne);
+
                         // printf("taille esttttttttttttt %d\n",*taillePatherne);
                         // for(int i=0;i< *taillePatherne;i++){
                           //  printf("%s\n",patherne[i]);
@@ -294,50 +297,59 @@ int main(int argc, char **argv) {
                         int *p_nb_argv = &nb_argv;
                         char **argv = malloc(sizeof(char*[MAX_TOKEN_ETOILE]));
                         if(argv == NULL){
-                            printf("Malloc a pas marché");
+                            printf("Malloc a pas marché\n");
                             free(argv);
                             return val;                        
                         }
 
-                        int result = etoile(patherne,taillePatherne,repEtoile,argv,p_nb_argv);
-
+                         int result = etoile(patherne,taillePatherne,repEtoile,argv,p_nb_argv);
+                        //printf("resultat de result %d\n",result);
 
                         //On copie jusqu'a i les élements de tokens
+                        if (compteur_etoile ==1){ //on recopie cette partie que la premiere fois
                         for(int j = 0;j < i;j++){
                             tokens_avec_fichiers_etoile[j]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
                             if(tokens_avec_fichiers_etoile[j] == NULL){
-                                printf("Malloc a pas marché");
+                                printf("Malloc a pas marché\n");
                                 free(tokens_avec_fichiers_etoile[j]);
                                 return 0;                        
                             }
                             sprintf(tokens_avec_fichiers_etoile[j],"%s",tokens[j]);
                             //strcpy(tokens_avec_fichiers_etoile[j],tokens[j]);
                             //tokens_avec_fichiers_etoile[j] = tokens[j];
+
+                        }
                         }
                         //On copie ensuite tous les éléments du tableau argv
                         for(int j = i,k = 0;j< i+nb_argv;j++,k++){
                             tokens_avec_fichiers_etoile[j]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
                             if(tokens_avec_fichiers_etoile[j] == NULL){
-                                printf("Malloc a pas marché");
+                                printf("Malloc a pas marché\n");
                                 free(tokens_avec_fichiers_etoile[j]);
                                 return 0;                        
                             }
                             sprintf(tokens_avec_fichiers_etoile[j],"%s",argv[k]);
-
+                        
                         }
 
                         //Enfin on copie le reste de ce qu'il yavait dans tokens a partir de i
+                        
                         for(int j = i+nb_argv,k = i+1;k < size;j++,k++){
                             tokens_avec_fichiers_etoile[j]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
                             if(tokens_avec_fichiers_etoile[j] == NULL){
-                                printf("Malloc a pas marché");
+                                printf("Malloc a pas marché\n");
                                 free(tokens_avec_fichiers_etoile[j]);
                                 return 0;                        
                             }
                             sprintf(tokens_avec_fichiers_etoile[j],"%s",tokens[k]);
+                            
 
                         }
-
+                          /*printf("Fichers etoile avant %d\n",nb_arg_tokens_avec_fichiers_etoile);
+                           for(int i=0;i< nb_arg_tokens_avec_fichiers_etoile;i++){
+                          printf("%s\n",tokens_avec_fichiers_etoile[i]);
+                            }*/
+                      
                         //On met à jour la taille du tableau contenant la commande et les fichiers etoiles
                         nb_arg_tokens_avec_fichiers_etoile = nb_arg_tokens_avec_fichiers_etoile + nb_argv;
                         il_ya_eu_etoile = compteur_etoile;
@@ -349,20 +361,20 @@ int main(int argc, char **argv) {
                             free(argv[i]);
                         }
                         free(argv);
+
                         free(patherne);
                         free(repEtoile);
-                        break;
-                    }  
+                        //break;
+                    }
                 }
-                nb_arg_tokens_avec_fichiers_etoile = nb_arg_tokens_avec_fichiers_etoile - il_ya_eu_etoile;
-
+ 
             }
-            //printf("Fichers etoile %d\n",nb_arg_tokens_avec_fichiers_etoile);
-            // for(int i=0;i< nb_arg_tokens_avec_fichiers_etoile;i++){
-            //    printf("%s\n",tokens_avec_fichiers_etoile[i]);
-            // }
+            /*printf("Fichers etoile %d\n",nb_arg_tokens_avec_fichiers_etoile);
+             for(int i=0;i< nb_arg_tokens_avec_fichiers_etoile;i++){
+                printf("%s\n",tokens_avec_fichiers_etoile[i]);
+            }*/
             
-
+             nb_arg_tokens_avec_fichiers_etoile = nb_arg_tokens_avec_fichiers_etoile -1;
 
             
 
