@@ -201,14 +201,6 @@ int main(int argc, char **argv) {
     //Free du buff    
     free(buff);
 
-
-    /* TODO: 
-        -Pour le readline, faudra afficher le repertoire courant avant le $ donc faudra une variable repertoire
-        courant qui changerea au fur et à mesure
-
-        -faudra garder les valeurs de retour des return
-        -Creer des dossiers test aussi pour les commandes
-    */
     int val = 0;
     rl_outstream = stderr;
     char chemin[PATH_MAX];
