@@ -93,6 +93,8 @@ char ** tokage(char * chaineASeparer,char separateur,int * taille){
 
     char  tmpSeparateur[1]="";
     tmpSeparateur[0]=separateur;
+    //char tmpchaineASeparer[1] ="";
+    //tmpchaineASeparer[0] = chaineASeparer[0];
     int len = strlen(chaineASeparer);
   //copie la commande pour pouvoir compter le nombre de cases de tokens
         char* tmp = malloc(len*sizeof(char)+1);
@@ -108,6 +110,7 @@ char ** tokage(char * chaineASeparer,char separateur,int * taille){
             size++;
             token = strtok(NULL,tmpSeparateur);
         }
+        //if(strcmp(tmpchaineASeparer,"/")==0){ size--;}
         //crée le tableau de tokens de taille size et ajoute les tokens séparés par " " dedans
 
         char**tokens = malloc(size*sizeof(char*)+1);
@@ -116,6 +119,16 @@ char ** tokage(char * chaineASeparer,char separateur,int * taille){
             exit(1);
         }
         int i =0;
+
+        /*f(strcmp(tmpchaineASeparer,"/")==0){           
+            tokens[i] =malloc(strlen(token)*sizeof(char)+1);
+            if( tokens[i]== NULL){
+                free(tokens[i]);
+                exit(1);
+            }
+            tokens[i] = "/"; 
+            i++;
+        }*/
         token = strtok(chaineASeparer, tmpSeparateur);
         while (token != NULL){
             tokens[i] =malloc(strlen(token)*sizeof(char)+1);
@@ -273,7 +286,8 @@ int main(int argc, char **argv) {
                         nb_arg_tokens_avec_fichiers_etoile = size;
                         compteur_etoile ++;
                         char * repEtoile =malloc(PATH_MAX*sizeof(char));
-                        memset(repEtoile,0,PATH_MAX*sizeof(char));  
+                        memset(repEtoile,0,PATH_MAX*sizeof(char));
+  
                         int t = 0;
                         //int result = 3;
                         //printf("resultat de result %d\n",result);
@@ -293,7 +307,6 @@ int main(int argc, char **argv) {
                             free(argv);
                             return val;                        
                         }
-
                          int result = etoile(patherne,taillePatherne,repEtoile,argv,p_nb_argv);
                         //printf("resultat de result %d\n",result);
 
