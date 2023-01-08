@@ -33,41 +33,81 @@
      * chemin -> c'est le rep ou se trouve etoile sois dans le courant sois apres un deplacement
      * argv -> c'est le tableau pour stocker les fichiers trouvé
      * nb_argv -> c'est la taille du tableau pour stocker les fichiers, 0 au depart
+     * commenceParSlash -> Pour le cas où le chemin commence par slash
      */
-int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_argv){
+int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_argv,int commenceParSlash){
 
 
     //variables
     int size = *size_trouver;
     int k =0;
+    char * repCourant = malloc(200*sizeof(char));
+    getcwd(repCourant,200);
         
     char * buf = malloc(PATH_MAX*sizeof(char));
-    memset(buf,0,sizeof(char)*PATH_MAX);
+    //memset(buf,0,sizeof(char)*PATH_MAX);
 
     DIR * dir = NULL;
     struct dirent * entry = NULL;
     struct  stat st;
-
-
- // ** arborecense des rep  pas de lien symbolyque juste les rep
- // ** quelque  
-
-        
+    struct  stat lst;
+    int result_stat;
+    int result_lstat;
+    
    ici:
-    
-    //dir = opendir(chemin);
-    
+   
     if(strcmp(chemin,"")==0)
-      {
-      dir =opendir(".");
+    {
+      //Si on est quelque part au milieu du chemin
+      if(!commenceParSlash) dir =opendir(".");
+
+      //Cas du premier tour de boucle ou chemin est vide et le chemin commence par slash
+      else dir=opendir(repCourant);
+
+    }else{//Cas où du tour de boucle n>= 1 où on a un chemin du type a/b/...
+
+      //Si le chemin commence par slash alors on met slash au début
+      if(commenceParSlash == 1){
+        // strcpy(buf, chemin);
+        // chemin[0] = '\0';
+        // strcat(chemin,"/");
+        // strcat(chemin,buf);
+        strcpy(buf, "/");
+        strcat(buf, chemin);
+        strcpy(chemin,buf);
       }
-      if(strcmp(chemin,"")!=0){ 
-         dir = opendir(chemin);
+      result_stat = stat(chemin,&st);
+      if( result_stat==-1){
+
+        result_lstat = lstat(chemin,&lst);
+
+        //Le cas où ni stat ni lstat ne marche
+        if( result_lstat ==-1){
+          // if((strcmp(chemin,"./commands/deck") == 0) || (strcmp(chemin,"./words/deck") == 0) ){
+          //   free(buf);
+          //   free(repCourant);
+          //   return 1;
+          // }
+          
+          free(buf);
+          free(repCourant);
+          //printf("Ni stat ni lstat ne marche sur %s et slash est %d\n",chemin,commenceParSlash);
+          return 1;
+            
+
+        }
+        readlink(chemin,buf,PATH_MAX);
+        printf("buf est %s\n et chemin est %s\n",buf,chemin);
+        dir = opendir(buf);
+
+      }else{
+        dir=opendir(chemin); 
       }
+    }
 
     if (dir == NULL){ 
-        printf("erreur de rep ");
-        goto error;
+      printf("erreur de rep ");
+      goto error;
     }
 
  
@@ -234,14 +274,13 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
                 if(stat(buf,&st)==-1){
                     printf("Le stat a pas marché iciiii\n");
                     goto error;
-                 }
+                }
                  // le premier caractere des noms  de fichiers
                 char tmp_dname [1] = "";
                 tmp_dname[0] = entry->d_name[0];
 
-                 if(S_ISDIR(st.st_mode)&&(strcmp(tmp_dname,".")!=0)&&(strcmp(entry->d_name,".")!=0) && (strcmp(entry->d_name,"..")!=0)){
-                    
-                 etoile(args,&size,buf,argv,nb_argv); // recursion sur le nouveau rep
+                if(S_ISDIR(st.st_mode)&&(strcmp(tmp_dname,".")!=0)&&(strcmp(entry->d_name,".")!=0) && (strcmp(entry->d_name,"..")!=0)){
+                  etoile(args,&size,buf,argv,nb_argv,0); // recursion sur le nouveau rep
                    
                 }
              
@@ -278,10 +317,9 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
                 
                 if(S_ISDIR(st.st_mode)&&(strcmp(tmp_dname,".")!=0)&&(strcmp(entry->d_name,".")!=0) && (strcmp(entry->d_name,"..")!=0)){
 
-                    if((suffix(extention+1,entry->d_name)==1)){
-                    
-                     etoile(args,&size,buf,argv,nb_argv); // recursion sur le nouveau rep
-                    }
+                  if((suffix(extention+1,entry->d_name)==1)){
+                    etoile(args,&size,buf,argv,nb_argv,0); // recursion sur le nouveau rep
+                  }
                 } 
              
              }
@@ -306,11 +344,12 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
     }
     closedir(dir);
     free(buf);
+
     //printf("Fin etoile extension\n");
     return 0;  
 
     error : {
-    //perror("erreur"); 
+    perror("erreur"); 
     closedir(dir);
     free(buf);
     return 1; 

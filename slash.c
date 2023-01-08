@@ -20,8 +20,9 @@
 #define MAX_FORMAT_STRLEN 30 // taille maximale pour le formatage
 #define MAX_TOKEN_NUMBER 10 //nombre maximale de tokens dans une ligne de commande
 #define PATH_MAX 4096 // taille maximale du chemin
+#define PATH_200 200 // taille maximale du chemin
 #define MAX_TAILLE_NOM_FICHIER 50
-#define MAX_TOKEN_ETOILE 500 //Nombre max de fichier récuperable avec les étoiles
+#define MAX_TOKEN_ETOILE 100 //Nombre max de fichier récuperable avec les étoiles
 #define PATH_COMMANDE_EXTERNE "/usr/bin"
 
 
@@ -186,14 +187,14 @@ int main(int argc, char **argv) {
     signal(SIGTERM,SIG_IGN);
     char* input;
     char * buff;
-    buff = malloc(4096*sizeof(char));
+    buff = malloc(PATH_200*sizeof(char));
 
     if(buff == NULL){
         printf("buff a pas marché\n");
         return 1;
     }
     //recupération du répertoire courant et stockage dans buff
-    getcwd(buff,4096);
+    getcwd(buff,PATH_200);
 
     //Création et Remplissage de path par buff
     struct string * path = string_new(PATH_MAX);
@@ -277,7 +278,7 @@ int main(int argc, char **argv) {
             //On cree un nouveau tableau token avec les anciens arguments de token
             //puis la partie où il y avait étoile remplacé par les fichiers trouvé
             int nb_arg_tokens_avec_fichiers_etoile = 0;
-            char **tokens_avec_fichiers_etoile = malloc(sizeof(char*[MAX_ARGS_NUMBER]));
+            char **tokens_avec_fichiers_etoile = malloc(sizeof(char*[PATH_200]));
             int il_ya_eu_etoile = 0;
             int compteur_etoile = 0;
             if (size >1){
@@ -285,8 +286,8 @@ int main(int argc, char **argv) {
                     if(strstr(tokens[i],"*")){ 
                         nb_arg_tokens_avec_fichiers_etoile = size;
                         compteur_etoile ++;
-                        char * repEtoile =malloc(PATH_MAX*sizeof(char));
-                        memset(repEtoile,0,PATH_MAX*sizeof(char));
+                        char * repEtoile =malloc(PATH_200*sizeof(char));
+                        memset(repEtoile,0,PATH_200*sizeof(char));
   
                         int t = 0;
                         //int result = 3;
@@ -307,7 +308,13 @@ int main(int argc, char **argv) {
                             free(argv);
                             return val;                        
                         }
-                         int result = etoile(patherne,taillePatherne,repEtoile,argv,p_nb_argv);
+
+                        //Pour verfiier si le chemin commence a la racine
+                        int commenceParSlash = 0;
+                        if(tokens[i][0] == '/')
+                            commenceParSlash = 1;
+
+                        int result = etoile(patherne,taillePatherne,repEtoile,argv,p_nb_argv,commenceParSlash);
                         //printf("resultat de result %d\n",result);
 
                         //On copie jusqu'a i les élements de tokens

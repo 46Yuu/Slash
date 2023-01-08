@@ -8,6 +8,8 @@
 #include "etoile.h"
 #include "cext.h"
 #include <dirent.h>
+#include <sys/wait.h>
+
 
 #define PATH_MAX 4096
 
