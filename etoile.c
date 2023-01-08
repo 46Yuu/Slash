@@ -156,7 +156,7 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
                 sprintf(argv[*nb_argv],"%s",buf); // on mets le contenu de buf dans le tableau
                 (*nb_argv)++;     
                 
-               etoile(args,&size,buf,argv,nb_argv); // recursion sur le nouveau rep          
+               etoile(args,&size,buf,argv,nb_argv,0); // recursion sur le nouveau rep          
 
             }
           }
@@ -237,10 +237,10 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
                 tmp_dname[0] = entry->d_name[0];
 
                  if(S_ISDIR(st.st_mode)&&(strcmp(tmp_dname,".")!=0)){  
-                    etoile(args,&size,buf,argv,nb_argv);}
+                    etoile(args,&size,buf,argv,nb_argv,0);}
                     if(!S_ISDIR(st.st_mode)&&strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 &&(strcmp(tmp_dname,".")!=0)){
                       size --;
-                      etoile(&args[k+1],&size,chemin,argv,nb_argv);
+                      etoile(&args[k+1],&size,chemin,argv,nb_argv,0);
                     }
 
                    
