@@ -12,6 +12,7 @@
 
 #define PATH_MAX 4096
 #define MAX_TAILLE_NOM_FICHIER 50
+#define MAX_TOKEN_ETOILE 500 //Nombre max de fichier récuperable avec les étoiles
 
 
   /**
@@ -48,7 +49,8 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
     struct  stat st;
 
 
-
+ // ** arborecense des rep  pas de lien symbolyque juste les rep
+ // ** quelque  
 
         
    ici:
@@ -70,7 +72,7 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
 
  
     // ------------------CAS 1------------------  
-    //cmd sans chemin(rep courant) / arriver au dernier * de la chaine
+    //cmd sans chemin(rep courant) || arriver au dernier * de la chaine || cmd **
     if (size == 1)  //CAS  cmd *.extention \ cmd * 
     {
         while ((entry=readdir(dir)))
@@ -98,7 +100,27 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
           char tmp_dname [1] = "";        // le premier caractere des noms  de fichiers
           tmp_dname[0] = entry->d_name[0];// pour comparer avec les dossier cacher caractere .
 
-             //DEUX CAS POSSIBLES
+             //TROIS CAS POSSIBLES
+          if(strcmp(args[k],"**")==0){ // cmd ** 
+
+            if ((strcmp(tmp_dname,".")!=0)&& S_ISDIR(st.st_mode)){
+ 
+                argv[*nb_argv]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
+                // test malloc
+                if(argv[*nb_argv] == NULL){
+                    printf("Malloc a pas marché\n");
+                    free(argv[*nb_argv]);
+                    goto error;
+                        
+                }
+                sprintf(argv[*nb_argv],"%s",buf); // on mets le contenu de buf dans le tableau
+                (*nb_argv)++;     
+                
+               etoile(args,&size,buf,argv,nb_argv); // recursion sur le nouveau rep          
+
+            }
+          }
+
           if(strcmp(args[k],"*")==0){ // cmd * 
 
             if ((strcmp(tmp_dname,".")!=0) && (strcmp(entry->d_name,".")!=0) && (strcmp(entry->d_name,"..")!=0)){ // pas un dossier cacher
@@ -146,12 +168,48 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
          //deux cas sois on est dans un rep precis sois dans * (tous les rep)
         char * res = strstr(args[k],"*");
 
-        if (res!=NULL){ // cas ou le repertoire contient etoile (on tombe sur * dans le parcours du chemin)
+        if (res!=NULL){ // cas ou le repertoire contient etoile (on tombe sur *  dans le parcours du chemin) || **
             
-            char * extention = args[k];
-            strtok(extention,"*"); // recuperer l"extention si y'en a pour la commparer avec la fin de tous les fichiers
+          char * extention = args[k];
+          strtok(extention,"*"); // recuperer l"extention si y'en a pour la commparer avec la fin de tous les fichiers
            
-             // deux cas
+          // TROIS CAS 
+
+          if (strcmp(args[k],"**")==0){
+
+             while ((entry=readdir(dir)))
+             {
+
+                if(strcmp(chemin,"")==0){
+              //
+                   sprintf(buf,"%s",entry->d_name); // on stock le nom de fichier trouver dans buf
+                } 
+                else {
+
+                  sprintf(buf,"%s/%s",chemin,entry->d_name); // on stock le chemin avec le nom de fichier trouver dans buf 
+                }
+                if(stat(buf,&st)==-1){
+                    printf("Le stat a pas marché iciiii\n");
+                    goto error;
+                 }
+                 // le premier caractere des noms  de fichiers
+                char tmp_dname [1] = "";
+                tmp_dname[0] = entry->d_name[0];
+
+                 if(S_ISDIR(st.st_mode)&&(strcmp(tmp_dname,".")!=0)){  
+                    etoile(args,&size,buf,argv,nb_argv);}
+                    if(!S_ISDIR(st.st_mode)&&strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 &&(strcmp(tmp_dname,".")!=0)){
+                      size --;
+                      etoile(&args[k+1],&size,chemin,argv,nb_argv);
+                    }
+
+                   
+                }
+             }
+             
+            
+
+          
           if(strcmp(args[k],"*")==0){ //  /*/
              
              //k++;
@@ -229,6 +287,7 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
              }
             }
         }
+
          else { // chemin sans etoile
 
                 
