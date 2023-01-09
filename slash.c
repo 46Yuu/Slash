@@ -146,7 +146,7 @@ int existenceCheminVersCmdExt(char * chemin,char *cmd){
         //printf("Overture non réussi\n");
         return -1;
     }
-    //printf("Overture réussi\n");
+    //printf("Overture réussi\n"result);
     struct dirent * entree = NULL;
     while((entree = readdir(dir))){
         //printf("%s ",entree->d_name);
@@ -173,7 +173,7 @@ int droitdExecuterLaCmdExt(char * chemin,char *cmd){
     }
     //printf("Overture réussi\n");
     struct dirent * entree = NULL;
-    while(entree = readdir(dir)){
+    while((entree = readdir(dir))){
         //printf("%s ",entree->d_name);
         if(strcmp(entree->d_name,cmd) == 0){
             //printf("Trouvé\n");
@@ -186,7 +186,7 @@ int droitdExecuterLaCmdExt(char * chemin,char *cmd){
                 retour = 0;
                 break;
             }
-            if(((st.st_mode && S_IRWXU) == S_IXUSR) || ((st.st_mode && S_IRWXG) == S_IXGRP) || ((st.st_mode && S_IRWXO) == S_IXOTH)) {
+            if(((st.st_mode & S_IXUSR) == S_IXUSR) || ((st.st_mode & S_IXGRP) == S_IXGRP) || ((st.st_mode & S_IXOTH) == S_IXOTH)) {
                 retour = 1;
             }
             break;
@@ -235,7 +235,7 @@ int main(int argc, char **argv) {
     tronquageA30Characteres(path->data,chemin,val,1);
     signal(SIGINT,SIG_IGN);
     signal(SIGTERM,SIG_IGN);
-    while (input = readline( chemin )) {
+    while ((input = readline( chemin ))) {
         int len = strlen(input);
         if (len > 0) {
             //ajoute la commande à l'historique pour l'utilisation flêches directionnelles 
@@ -334,6 +334,7 @@ int main(int argc, char **argv) {
                                 //tokens_avec_fichiers_etoile[j] = tokens[j];
                             }
                         }
+                        result++;
                         //On copie ensuite tous les éléments du tableau argv
                         for(int j = i,k = 0;j< i+nb_argv;j++,k++){
                             tokens_avec_fichiers_etoile[j]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
@@ -452,7 +453,7 @@ int main(int argc, char **argv) {
                         //write(STDERR_FILENO,"bash: ./nonexistent: No such file or directory\n",50);
                         write(STDERR_FILENO,"bash: ",7);
                         write(STDERR_FILENO,tokens[0],strlen(tokens[0]));
-                        write(STDERR_FILENO,": Permission denied\n",22);
+                        write(STDERR_FILENO,": Permission denied\n",21);
                     }
                 }
                 else{//Le cas où le chemin est incorrecte on renvoie la valeur d'erreur 1
@@ -464,7 +465,7 @@ int main(int argc, char **argv) {
                     //write(STDERR_FILENO,"bash: ./nonexistent: No such file or directory\n",50);
                     write(STDERR_FILENO,"bash: ",7);
                     write(STDERR_FILENO,tokens[0],strlen(tokens[0]));
-                    write(STDERR_FILENO,": No such file or directory\n",30);
+                    write(STDERR_FILENO,": No such file or directory\n",29);
                     // printf("bash: %d: No such file or directory\n",tokens[0]);
                 }
                 free(save);
@@ -481,18 +482,16 @@ int main(int argc, char **argv) {
                     }
                     else{
                         val = cext(tokens,size,path); 
-                    } 
+                    }
                     //printf("Apres Chemin normal\n");
                 }
                 else{
                     //Commande inexistante
-                    // if (il_ya_eu_etoile){
-                    //     val = cext(tokens_avec_fichiers_etoile,nb_arg_tokens_avec_fichiers_etoile,path); 
-                    // }
-                    // else{
-                    //     val = cext(tokens,size,path); 
-                    // } 
+
                     val = 127;
+
+                    write(STDERR_FILENO,tokens[0],strlen(tokens[0]));
+                    write(STDERR_FILENO," : commande introuvable\n",25);
                     // printf("bash: %d: No such file or directory\n",tokens[0]);
                 }
             }
