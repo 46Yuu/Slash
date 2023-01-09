@@ -55,14 +55,11 @@ void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val){
         strcat(cheminA30Caracteres,"$ ");
     }
     //printf("trunc %s\n",data);
-
-    
     //printf("fin trunc %s\n",cheminA30Caracteres);
     //memcpy(NvoChemin,chemin,3); //On copie les 3 premiers charactères ie "[0]" par exemple
     //strcat(NvoChemin,"..."); //On ajoute les 3 points
     //strcat(NvoChemin,chemin+(len-24)); //On colle le reste du chemin ie 24 derniers charactères
 }
-
 
 //Verifie si la commande externe existe c'est à dire si elle est dans le fichier /usr/bin
 int existenceCommandeExterne(char * cmd){
@@ -73,12 +70,9 @@ int existenceCommandeExterne(char * cmd){
         return -1;
     }
     struct dirent * entree = NULL;
-    
-
     int compteur = 0;
     while((entree = readdir(dir))){
         //printf("Compteur est %d",compteur);
-
         compteur++;
         //printf("%s ",entree->d_name);
         if(strcmp(entree->d_name,cmd) == 0){
@@ -87,17 +81,15 @@ int existenceCommandeExterne(char * cmd){
             break;
         }
     }
-
     return retour;
 }
+
 // separe la chaine selon le separateur
 char ** tokage(char * chaineASeparer,char separateur,int * taille){
-
     char  tmpSeparateur[1]="";
     tmpSeparateur[0]=separateur;
     int len = strlen(chaineASeparer);
-
-  //copie la commande pour pouvoir compter le nombre de cases de tokens
+    //copie la commande pour pouvoir compter le nombre de cases de tokens
         char* tmp = malloc(len*sizeof(char)+1);
         if(tmp == NULL){
             free(tmp);
@@ -112,14 +104,12 @@ char ** tokage(char * chaineASeparer,char separateur,int * taille){
             token = strtok(NULL,tmpSeparateur);
         }
         //crée le tableau de tokens de taille size et ajoute les tokens séparés par " " dedans
-
         char**tokens = malloc(size*sizeof(char*)+1);
         if(tokens == NULL){
             free(tokens);
             exit(1);
         }
         int i =0;
-
         token = strtok(chaineASeparer, tmpSeparateur);
         while (token != NULL){
             tokens[i] =malloc(strlen(token)*sizeof(char)+1);
@@ -132,18 +122,14 @@ char ** tokage(char * chaineASeparer,char separateur,int * taille){
             token = strtok(NULL, tmpSeparateur);
         }  
         free(tmp);
-
         *taille = size;
         //printf("juste ici !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-
         return tokens;
-        
 }
 
 //On verfie si le chemin donné est correct avant d'executer la commande
 int existenceCheminVersCmdExt(char * chemin,char *cmd){
     //printf("Arrivé ici au moins et le dossier est %s et cmd est %s\n",chemin,cmd);
-
     int retour = 0;
     //printf("La commande est %s",cmd);
     DIR * dir = opendir(chemin);
@@ -152,11 +138,8 @@ int existenceCheminVersCmdExt(char * chemin,char *cmd){
         return -1;
     }
     //printf("Overture réussi\n");
-
     struct dirent * entree = NULL;
-
     while((entree = readdir(dir))){
-
         //printf("%s ",entree->d_name);
         if(strcmp(entree->d_name,cmd) == 0){
             //printf("Trouvé\n");
@@ -164,31 +147,26 @@ int existenceCheminVersCmdExt(char * chemin,char *cmd){
             break;
         }
     }
-    
     closedir(dir);
     return retour;
 }
 
 int main(int argc, char **argv) {
     printf("------------------------Test de Make sur slash-------------\n");
-
     signal(SIGINT,SIG_IGN);
     signal(SIGTERM,SIG_IGN);
     char* input;
     char * buff;
     buff = malloc(PATH_100*sizeof(char));
-
     if(buff == NULL){
         printf("buff a pas marché\n");
         return 1;
     }
     //recupération du répertoire courant et stockage dans buff
     getcwd(buff,PATH_100);
-
     //Création et Remplissage de path par buff
     struct string * path = string_new(PATH_MAX);
     struct string * pathBefore = string_new(PATH_MAX);
-
     if(path == NULL){
         printf("path a pas marché\n");
         return 1;
@@ -199,11 +177,8 @@ int main(int argc, char **argv) {
     }
     string_append(path,buff);
     string_append(pathBefore,buff);
-
-
     //Free du buff    
     free(buff);
-
     int val = 0;
     rl_outstream = stderr;
     char chemin[PATH_MAX];
@@ -217,7 +192,6 @@ int main(int argc, char **argv) {
     strcat(chemin,"$ ");*/
     tronquageA30Characteres(path->data,chemin,val);
     while ((input = readline( chemin ))) {
-
         int len = strlen(input);
         if (len > 0) {
             //ajoute la commande à l'historique pour l'utilisation flêches directionnelles 
@@ -261,7 +235,8 @@ int main(int argc, char **argv) {
         else if(strcmp(tokens[0],"pwd") == 0){
             //printf("lancement de la fonction pwd\n");
             val = pwd(tokens,size,path->data);
-        }else{
+        }
+        else{
             //Cas des commandes externes
             //On verfie au debut si il y'a étoiles dans les arguments et si oui
             //On cree un nouveau tableau token avec les anciens arguments de token
@@ -276,23 +251,20 @@ int main(int argc, char **argv) {
                         //le rep courant
                         char * repCourant = malloc(100*sizeof(char));
                         getcwd(repCourant,100);
-
                          //Pour verfiier si le chemin commence a la racine et 
                          // contine le chemin du rep courant dedans
                          // si c'est le cas on le supprime de la chaine tokens[i]
                         int commenceParSlash = 0;
-                        if(tokens[i][0] == '/') commenceParSlash = 1;
-                         if(strstr(tokens[i],repCourant)){
+                        if(tokens[i][0] == '/'){
+                            commenceParSlash = 1;
+                        }
+                        if(strstr(tokens[i],repCourant)){
                             strcpy(tokens[i],tokens[i]+strlen(repCourant)+1);
-                         }
-
+                        }
                         nb_arg_tokens_avec_fichiers_etoile = size;
                         compteur_etoile ++;
-
                         char * repEtoile =malloc(PATH_100*sizeof(char));
                         memset(repEtoile,0,PATH_100*sizeof(char));
-                    
-
                         int nb_argv = 0;
                         int *p_nb_argv = &nb_argv;
                         char **argv = malloc(sizeof(char*[MAX_TOKEN_ETOILE]));
@@ -301,30 +273,24 @@ int main(int argc, char **argv) {
                             free(argv);
                             return val;                        
                         }
-            
                         int t = 0;
                         int * taillePatherne = &t;
                         char ** patherne;
-                       
-                          patherne = tokage(tokens[i],'/',taillePatherne); 
-                          
-                         int result = etoile(patherne,taillePatherne,repEtoile,argv,p_nb_argv,commenceParSlash,repCourant);
-                          
-
+                        patherne = tokage(tokens[i],'/',taillePatherne); 
+                        int result = etoile(patherne,taillePatherne,repEtoile,argv,p_nb_argv,commenceParSlash,repCourant);
                         //On copie jusqu'a i les élements de tokens
                         if (compteur_etoile ==1){ //on recopie cette partie que la premiere fois
-                        for(int j = 0;j < i;j++){
-                            tokens_avec_fichiers_etoile[j]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
-                            if(tokens_avec_fichiers_etoile[j] == NULL){
-                                printf("Malloc a pas marché\n");
-                                free(tokens_avec_fichiers_etoile[j]);
-                                return 0;                        
+                            for(int j = 0;j < i;j++){
+                                tokens_avec_fichiers_etoile[j]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
+                                if(tokens_avec_fichiers_etoile[j] == NULL){
+                                    printf("Malloc a pas marché\n");
+                                    free(tokens_avec_fichiers_etoile[j]);
+                                    return 0;                        
+                                }
+                                sprintf(tokens_avec_fichiers_etoile[j],"%s",tokens[j]);
+                                //strcpy(tokens_avec_fichiers_etoile[j],tokens[j]);
+                                //tokens_avec_fichiers_etoile[j] = tokens[j];
                             }
-                            sprintf(tokens_avec_fichiers_etoile[j],"%s",tokens[j]);
-                            //strcpy(tokens_avec_fichiers_etoile[j],tokens[j]);
-                            //tokens_avec_fichiers_etoile[j] = tokens[j];
-
-                        }
                         }
                         //On copie ensuite tous les éléments du tableau argv
                         for(int j = i,k = 0;j< i+nb_argv;j++,k++){
@@ -335,11 +301,8 @@ int main(int argc, char **argv) {
                                 return 0;                        
                             }
                             sprintf(tokens_avec_fichiers_etoile[j],"%s",argv[k]);
-                        
                         }
-
                         //Enfin on copie le reste de ce qu'il yavait dans tokens a partir de i
-                        
                         for(int j = i+nb_argv,k = i+1;k < size;j++,k++){
                             tokens_avec_fichiers_etoile[j]=malloc(MAX_TAILLE_NOM_FICHIER * sizeof(char)+1); 
                             if(tokens_avec_fichiers_etoile[j] == NULL){
@@ -348,43 +311,32 @@ int main(int argc, char **argv) {
                                 return 0;                        
                             }
                             sprintf(tokens_avec_fichiers_etoile[j],"%s",tokens[k]);
-                            
-
                         }
-                          /*printf("Fichers etoile avant %d\n",nb_arg_tokens_avec_fichiers_etoile);
-                           for(int i=0;i< nb_arg_tokens_avec_fichiers_etoile;i++){
-                          printf("%s\n",tokens_avec_fichiers_etoile[i]);
-                            }*/
-                      
+                        /*printf("Fichers etoile avant %d\n",nb_arg_tokens_avec_fichiers_etoile);
+                        for(int i=0;i< nb_arg_tokens_avec_fichiers_etoile;i++){
+                        printf("%s\n",tokens_avec_fichiers_etoile[i]);
+                        }*/
                         //On met à jour la taille du tableau contenant la commande et les fichiers etoiles
                         nb_arg_tokens_avec_fichiers_etoile = nb_arg_tokens_avec_fichiers_etoile + nb_argv;
                         il_ya_eu_etoile = compteur_etoile;
                         //printf("Fichers etoile %d\n",nb_arg_tokens_avec_fichiers_etoile);
-
-                        
                         //On libére le tableau argv et les autres pointeur qu'on utilisera plus
                         for(int i = 0; i < nb_argv; i++){
                             free(argv[i]);
                         }
                         free(argv);
-
                         //free(patherne);
                         free(repEtoile);
                         free(repCourant);
                         //break;
                     }
                 }
- 
             }
             /*printf("Fichers etoile %d\n",nb_arg_tokens_avec_fichiers_etoile);
-             for(int i=0;i< nb_arg_tokens_avec_fichiers_etoile;i++){
-                printf("%s\n",tokens_avec_fichiers_etoile[i]);
+            for(int i=0;i< nb_arg_tokens_avec_fichiers_etoile;i++){
+            printf("%s\n",tokens_avec_fichiers_etoile[i]);
             }*/
-            
-             nb_arg_tokens_avec_fichiers_etoile = nb_arg_tokens_avec_fichiers_etoile -1;
-
-            
-
+            nb_arg_tokens_avec_fichiers_etoile = nb_arg_tokens_avec_fichiers_etoile -1;
             //On verifier si c'est un chemin vers une commande externe
             int estCheminVersCmdExt = 0;
             for(int i = 0; i < strlen(tokens[0]); i++){
@@ -394,7 +346,6 @@ int main(int argc, char **argv) {
                     break;
                 }
             }
-
             //Le cas où c'est un chemin vers une commande externe
             if(estCheminVersCmdExt == 1){
                 //compte la taille du tableau de tokens[0] avec comme séparateur "/"
@@ -402,8 +353,6 @@ int main(int argc, char **argv) {
                 char * tmpToken0 = malloc(strlen(tokens[0])*sizeof(char)+1);
                 char * save = malloc(strlen(tokens[0])*sizeof(char)+1);
                 char * savePourSecondTok = malloc(strlen(tokens[0])*sizeof(char)+1);
-
-
                 if(tmpToken0 == NULL){
                     free(tmpToken0);
                     exit(1);
@@ -419,15 +368,12 @@ int main(int argc, char **argv) {
                 strcpy(tmpToken0,tokens[0]);
                 strcpy(save,tokens[0]);
                 strcpy(savePourSecondTok,tokens[0]);
-
                 //printf("tokens  0 est %s\n",tmpToken0);
-
                 char* tok = strtok(tmpToken0, "/");
                 while (tok != NULL){
                     tailleApresSeparation++;
                     tok = strtok(NULL, "/");
                 }
-
                 //crée le tableau de toutes les parties du chemin de taille tailleApresSeparation 
                 //et ajoute les parties séparés par "/" dedans
                 char *tokens0[tailleApresSeparation];
@@ -438,7 +384,6 @@ int main(int argc, char **argv) {
                     i++;
                     tokk = strtok(NULL, "/");
                 }
-
                 //On enleve la commande a la fin du chemin et on obtient
                 //le chemin vers le dossier où est stocké la commande
                 //tailleApresSeparation - 1 est la fin du tableau c'est-à-dire là où on a la commande
@@ -446,22 +391,19 @@ int main(int argc, char **argv) {
                 //printf("La taille à enlever est donc %d\n",tailleAEnlever);
                 save[strlen(save) - tailleAEnlever] = '\0';
                 //printf("Enfin save est %s\n",save);
-
                 //Quand le chemin vers la commande est correcte alors on lance la commande
                 if(existenceCheminVersCmdExt(save,tokens0[tailleApresSeparation - 1]) == 1){
                     tokens[0] = tokens0[tailleApresSeparation - 1];
                     //printf("Bref tokens[0] est %s \n",tokens[0]);
-
                     if (il_ya_eu_etoile) val = cext(tokens_avec_fichiers_etoile,nb_arg_tokens_avec_fichiers_etoile,path); 
                     else val = cext(tokens,size,path); 
-                }else{//Le cas où le chemin est incorrecte on renvoie la valeur d'erreur 1
-
+                }
+                else{//Le cas où le chemin est incorrecte on renvoie la valeur d'erreur 1
                     //val = 1;
                 }
                 free(save);
                 free(tmpToken0);
                 free(savePourSecondTok );
-
             }
             //Si ce n'est pas un chemin vers une commande externe c'est à dire que c'est juste une commande externe
             else{
@@ -469,33 +411,22 @@ int main(int argc, char **argv) {
                 if (il_ya_eu_etoile) val = cext(tokens_avec_fichiers_etoile,nb_arg_tokens_avec_fichiers_etoile,path); 
                 else val = cext(tokens,size,path); 
                 //printf("Apres Chemin normal\n");
-
             }
-
             //On free le tableau avec les fichiers etoiles
             for(int i = 0; i < nb_arg_tokens_avec_fichiers_etoile; i++){
                 free(tokens_avec_fichiers_etoile[i]);
             }
             free(tokens_avec_fichiers_etoile);
- 
-
         }
-            
-        
-
         //Pour mettre la variable chemin à jour
         tronquageA30Characteres(path->data,chemin,val);
-
         // readline fait un malloc à chaque fois donc on dois le free à la fin
         //free(argv);
         free(tmp);
         free(input);
- 
     }
-
     //Pour faire un free de path
     string_delete(path);
     return val;
-
 }
 

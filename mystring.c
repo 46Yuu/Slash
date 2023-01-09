@@ -28,7 +28,6 @@ struct string * string_new(size_t capacity){
     }
     s->dataBefore[0] = 0;
     return s;
-
 }
 
 // Détruit une chaîne, en libérant la mémoire occupée.
@@ -42,11 +41,9 @@ void string_delete(struct string * str){
 // Renvoie 1 en cas de réussite, 0 en cas d'échec.
 // Échoue sans rien modifier si le buffer n'est pas assez grand.
 int string_append (struct string * dest, char * src){
-
     //length ne compte pas le caractere vide
     if((dest->length + strlen(src) +1 ) > dest->capacity)
         return 0;
-
     memmove(dest->data+dest->length, src,strlen(src)+1);
     dest->length = dest->length + strlen(src);
     return 1;
@@ -55,8 +52,7 @@ int string_append (struct string * dest, char * src){
 // Tronque la chaîne en enlevant les nchars derniers caractères
 // (ou tous les caractères s'il y en a moins de nchars).
 void string_truncate (struct string * str, size_t nchars){
-    if(nchars >= str->length)
-    {
+    if(nchars >= str->length){
         str->length = 0;
         str->data[0] = '\0';
     }
@@ -70,8 +66,6 @@ void string_truncate (struct string * str, size_t nchars){
 
 //Tronque la chaine de la fin vers le debut jusqu'a trouver le premier "/" pour gérer les chemins (les cd ..)
 void string_truncate_to_slash (struct string * str){
-    
     string_truncate(str,strlen(strrchr(str->data,'/')));
-
 }
 
