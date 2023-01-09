@@ -95,9 +95,8 @@ char ** tokage(char * chaineASeparer,char separateur,int * taille){
 
     char  tmpSeparateur[1]="";
     tmpSeparateur[0]=separateur;
-    //char tmpchaineASeparer[1] ="";
-    //tmpchaineASeparer[0] = chaineASeparer[0];
     int len = strlen(chaineASeparer);
+
   //copie la commande pour pouvoir compter le nombre de cases de tokens
         char* tmp = malloc(len*sizeof(char)+1);
         if(tmp == NULL){
@@ -112,7 +111,6 @@ char ** tokage(char * chaineASeparer,char separateur,int * taille){
             size++;
             token = strtok(NULL,tmpSeparateur);
         }
-        //if(strcmp(tmpchaineASeparer,"/")==0){ size--;}
         //crée le tableau de tokens de taille size et ajoute les tokens séparés par " " dedans
 
         char**tokens = malloc(size*sizeof(char*)+1);
@@ -122,15 +120,6 @@ char ** tokage(char * chaineASeparer,char separateur,int * taille){
         }
         int i =0;
 
-        /*f(strcmp(tmpchaineASeparer,"/")==0){           
-            tokens[i] =malloc(strlen(token)*sizeof(char)+1);
-            if( tokens[i]== NULL){
-                free(tokens[i]);
-                exit(1);
-            }
-            tokens[i] = "/"; 
-            i++;
-        }*/
         token = strtok(chaineASeparer, tmpSeparateur);
         while (token != NULL){
             tokens[i] =malloc(strlen(token)*sizeof(char)+1);
@@ -150,7 +139,6 @@ char ** tokage(char * chaineASeparer,char separateur,int * taille){
         return tokens;
         
 }
-
 
 //On verfie si le chemin donné est correct avant d'executer la commande
 int existenceCheminVersCmdExt(char * chemin,char *cmd){
@@ -282,14 +270,13 @@ int main(int argc, char **argv) {
             char **tokens_avec_fichiers_etoile = malloc(sizeof(char*[PATH_100]));
             int il_ya_eu_etoile = 0;
             int compteur_etoile = 0;
-            struct stat stt;
             if (size >1){
                 for (int i=0;i< size;i++){
                     if(strstr(tokens[i],"*")){ 
                         //le rep courant
                         char * repCourant = malloc(100*sizeof(char));
                         getcwd(repCourant,100);
-                        
+
                          //Pour verfiier si le chemin commence a la racine et 
                          // contine le chemin du rep courant dedans
                          // si c'est le cas on le supprime de la chaine tokens[i]
@@ -305,13 +292,7 @@ int main(int argc, char **argv) {
                         char * repEtoile =malloc(PATH_100*sizeof(char));
                         memset(repEtoile,0,PATH_100*sizeof(char));
                     
-                    
-  
-                        int t = 0;
-                        int * taillePatherne = &t;
 
-                        char ** patherne = tokage(tokens[i],'/',taillePatherne);
-                        
                         int nb_argv = 0;
                         int *p_nb_argv = &nb_argv;
                         char **argv = malloc(sizeof(char*[MAX_TOKEN_ETOILE]));
@@ -320,8 +301,15 @@ int main(int argc, char **argv) {
                             free(argv);
                             return val;                        
                         }
-
-                        int result = etoile(patherne,taillePatherne,repEtoile,argv,p_nb_argv,commenceParSlash,repCourant);
+            
+                        int t = 0;
+                        int * taillePatherne = &t;
+                        char ** patherne;
+                       
+                          patherne = tokage(tokens[i],'/',taillePatherne); 
+                          
+                         int result = etoile(patherne,taillePatherne,repEtoile,argv,p_nb_argv,commenceParSlash,repCourant);
+                          
 
                         //On copie jusqu'a i les élements de tokens
                         if (compteur_etoile ==1){ //on recopie cette partie que la premiere fois
@@ -380,7 +368,7 @@ int main(int argc, char **argv) {
                         }
                         free(argv);
 
-                        free(patherne);
+                        //free(patherne);
                         free(repEtoile);
                         free(repCourant);
                         //break;

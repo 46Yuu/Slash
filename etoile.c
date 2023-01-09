@@ -41,6 +41,7 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
 
     //variables
     int size = *size_trouver;
+
     int k =0;
     
     char * buf = malloc(PATH_MAX*sizeof(char));
@@ -95,7 +96,7 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
       printf("erreur de rep ");
       goto error;
     }
-
+ 
  
     // ------------------CAS 1------------------  
     //cmd sans chemin(rep courant) || arriver au dernier * de la chaine || cmd **
@@ -139,7 +140,7 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
                     goto error;
                         
                 }
-                sprintf(argv[*nb_argv],"%s",buf); // on mets le contenu de buf dans le tableau
+                sprintf(argv[*nb_argv],"%s/",buf); // on mets le contenu de buf dans le tableau
                 (*nb_argv)++;     
                 
                etoile(args,&size,buf,argv,nb_argv,0,repCourant); // recursion sur le nouveau rep          
@@ -215,18 +216,22 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
                   sprintf(buf,"%s/%s",chemin,entry->d_name); // on stock le chemin avec le nom de fichier trouver dans buf 
                 }
                 if(stat(buf,&st)==-1){
-                    printf("Le stat a pas marché iciiii\n");
+                    printf("Le stat a pas marché iciiii/**/\n");
                     goto error;
                  }
                  // le premier caractere des noms  de fichiers
                 char tmp_dname [1] = "";
                 tmp_dname[0] = entry->d_name[0];
-
+                  
                  if(S_ISDIR(st.st_mode)&&(strcmp(tmp_dname,".")!=0)){  
                     etoile(args,&size,buf,argv,nb_argv,0,repCourant);}
+
                     if(!S_ISDIR(st.st_mode)&&strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 &&(strcmp(tmp_dname,".")!=0)){
                       size --;
-                      etoile(&args[k+1],&size,chemin,argv,nb_argv,0,repCourant);
+                      k++;
+                      goto ici;
+                      //etoile(args,&size,chemin,argv,nb_argv,0,repCourant);
+                      
                     }
 
                    
@@ -258,7 +263,7 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
 
                 }
                 if(stat(buf,&st)==-1){
-                    printf("Le stat a pas marché iciiii\n");
+                    printf("Le stat a pas marché ici /*/\n");
                     goto error;
                 }
                  // le premier caractere des noms  de fichiers
@@ -293,7 +298,7 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
 
                 }
                 if(stat(buf,&st)==-1){
-                    printf("Le stat a pas marché iciiii\n");
+                    printf("Le stat a pas marché iciiii/*qelq/\n");
                     goto error;
                  }
                  // le premier caractere des noms  de fichiers
@@ -316,8 +321,7 @@ int etoile(char ** args, int * size_trouver, char * chemin,char ** argv,int *nb_
 
                 
            if((strcmp(chemin,"")!=0))  strcat(chemin,"/"); 
-            
-            strcat(chemin,args[k]);
+            strcat(chemin,args[k]); 
            
             size = size-1;
             k++; // avancer dans les args 

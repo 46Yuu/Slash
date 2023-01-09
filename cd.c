@@ -29,7 +29,7 @@ int cd(char *tokens[],int size,struct string * path){
             if (tokens[i] !=NULL){ // si il y a un chemin ou un "-" en parametre
                 if (strcmp(tokens[i],"-")==0) //cd -P -
                 {
-                    //code
+                    
                 }else{
                     //Cree un dir pour pouvoir utiliser opendir sur le fichier à vérifier l'existance 
                     DIR * dir = NULL;
