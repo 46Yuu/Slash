@@ -26,16 +26,22 @@
 #define MAX_TOKEN_ETOILE 100 //Nombre max de fichier récuperable avec les étoiles
 #define PATH_COMMANDE_EXTERNE "/usr/bin"
 
-
+int val;
 //Tronquage du chemin à afficher à 30 charactères
-void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val){
+void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val, int taille_val){
     int len = strlen(data);
     //printf("trunc\n");
     cheminA30Caracteres[0] = '\0';
-    char valeurRetour[2];
+    char valeurRetour[taille_val+1];
     sprintf(valeurRetour,"%d",val);
     strcat(cheminA30Caracteres,"[");
-    if(val == 0){
+    if(val == 255){
+        strcat(cheminA30Caracteres,"\001\033[32m\002");
+        strcat(cheminA30Caracteres,"SIG");
+        strcat(cheminA30Caracteres,"\001\033[00m\002");
+        strcat(cheminA30Caracteres,"]");
+    }
+    else if(val == 0){
         strcat(cheminA30Caracteres,"\001\033[32m\002");
     }
     else {
@@ -44,14 +50,15 @@ void tronquageA30Characteres(char * data, char * cheminA30Caracteres, int val){
     strcat(cheminA30Caracteres,valeurRetour);
     strcat(cheminA30Caracteres,"\001\033[00m\002");
     strcat(cheminA30Caracteres,"]");
-    //Si la taille est bonne, on ne touche pas au chemin; le -8 est parce qu'on devra ajouter '[0]...' et '$ ' à la fin
-    if(len <= (MAX_FORMAT_STRLEN -8)){
+    //Si la taille est bonne, on ne touche pas au chemin; le -7 est parce qu'on devra ajouter '[0]...' et '$ ' à la fin
+    //du coup il y'aura taille_val aussi d'enlevé
+    if(len <= (MAX_FORMAT_STRLEN -7-taille_val)){
         strcat(cheminA30Caracteres,data);
         strcat(cheminA30Caracteres,"$ ");
     }else{
         //On crée le chemin à renvoyer quand la taille dépasse 30
         strcat(cheminA30Caracteres,"...");
-        strcat(cheminA30Caracteres,data+(len- (MAX_FORMAT_STRLEN -8) ));
+        strcat(cheminA30Caracteres,data+(len- (MAX_FORMAT_STRLEN -7-taille_val) ));
         strcat(cheminA30Caracteres,"$ ");
     }
     //printf("trunc %s\n",data);
@@ -67,7 +74,7 @@ int existenceCommandeExterne(char * cmd){
     //printf("La commande est %s",cmd);
     DIR * dir = opendir(PATH_COMMANDE_EXTERNE);
     if(dir == NULL){
-        return -1;
+        return 0;
     }
     struct dirent * entree = NULL;
     int compteur = 0;
@@ -81,6 +88,7 @@ int existenceCommandeExterne(char * cmd){
             break;
         }
     }
+    closedir(dir);
     return retour;
 }
 
@@ -117,7 +125,8 @@ char ** tokage(char * chaineASeparer,char separateur,int * taille){
                 free(tokens[i]);
                 exit(1);
             }
-            tokens[i] = token;
+            strcpy(tokens[i],token);
+            //tokens[i]    = token;
             i++;
             token = strtok(NULL, tmpSeparateur);
         }  
@@ -151,10 +160,44 @@ int existenceCheminVersCmdExt(char * chemin,char *cmd){
     return retour;
 }
 
-int main(int argc, char **argv) {
-    printf("------------------------Test de Make sur slash-------------\n");
-    signal(SIGINT,SIG_IGN);
-    signal(SIGTERM,SIG_IGN);
+//On verfie si on a le droit d'executer la commande
+int droitdExecuterLaCmdExt(char * chemin,char *cmd){
+    //printf("Arrivé ici au moins et le dossier est %s et cmd est %s\n",chemin,cmd);
+    int retour = 0;
+    //printf("La commande est %s",cmd);
+    DIR * dir = opendir(chemin);
+    struct stat st;
+    if(dir == NULL){
+        //printf("Overture non réussi\n");
+        return -1;
+    }
+    //printf("Overture réussi\n");
+    struct dirent * entree = NULL;
+    while(entree = readdir(dir)){
+        //printf("%s ",entree->d_name);
+        if(strcmp(entree->d_name,cmd) == 0){
+            //printf("Trouvé\n");
+            //printf("************");
+            char chemin_vers_fichier[100] = "";
+            strcpy(chemin_vers_fichier,chemin);
+            strcat(chemin_vers_fichier,"/");
+            strcat(chemin_vers_fichier,cmd);
+            if(stat(chemin_vers_fichier,&st) == -1){
+                retour = 0;
+                break;
+            }
+            if(((st.st_mode && S_IRWXU) == S_IXUSR) || ((st.st_mode && S_IRWXG) == S_IXGRP) || ((st.st_mode && S_IRWXO) == S_IXOTH)) {
+                retour = 1;
+            }
+            break;
+        }
+    }
+    closedir(dir);
+    return retour;
+}
+
+int main(int argc, char **argv) { 
+    val = 0;
     char* input;
     char * buff;
     buff = malloc(PATH_100*sizeof(char));
@@ -179,7 +222,6 @@ int main(int argc, char **argv) {
     string_append(pathBefore,buff);
     //Free du buff    
     free(buff);
-    int val = 0;
     rl_outstream = stderr;
     char chemin[PATH_MAX];
     chemin[0] = '\0';
@@ -190,8 +232,10 @@ int main(int argc, char **argv) {
     strcat(chemin,"]");
     strcat(chemin,path->data);
     strcat(chemin,"$ ");*/
-    tronquageA30Characteres(path->data,chemin,val);
-    while ((input = readline( chemin ))) {
+    tronquageA30Characteres(path->data,chemin,val,1);
+    signal(SIGINT,SIG_IGN);
+    signal(SIGTERM,SIG_IGN);
+    while (input = readline( chemin )) {
         int len = strlen(input);
         if (len > 0) {
             //ajoute la commande à l'historique pour l'utilisation flêches directionnelles 
@@ -230,7 +274,6 @@ int main(int argc, char **argv) {
         else if(strcmp(tokens[0],"cd") == 0){
             //printf("lancement de la fonction cd\n");
             val = cd(tokens,size,path);
-
         }
         else if(strcmp(tokens[0],"pwd") == 0){
             //printf("lancement de la fonction pwd\n");
@@ -275,8 +318,7 @@ int main(int argc, char **argv) {
                         }
                         int t = 0;
                         int * taillePatherne = &t;
-                        char ** patherne;
-                        patherne = tokage(tokens[i],'/',taillePatherne); 
+                        char ** patherne = tokage(tokens[i],'/',taillePatherne); 
                         int result = etoile(patherne,taillePatherne,repEtoile,argv,p_nb_argv,commenceParSlash,repCourant);
                         //On copie jusqu'a i les élements de tokens
                         if (compteur_etoile ==1){ //on recopie cette partie que la premiere fois
@@ -324,8 +366,14 @@ int main(int argc, char **argv) {
                         for(int i = 0; i < nb_argv; i++){
                             free(argv[i]);
                         }
+                        // printf("t = %d\n",t);
+                        // printf("taillePatherne = %d\n",*taillePatherne);
+                        for(int i = 0; i <t;i++){
+                            // printf("patherne[i] = %s\n",patherne[i]);
+                            free(patherne[i]);
+                        }
                         free(argv);
-                        //free(patherne);
+                        free(patherne);
                         free(repEtoile);
                         free(repCourant);
                         //break;
@@ -393,13 +441,31 @@ int main(int argc, char **argv) {
                 //printf("Enfin save est %s\n",save);
                 //Quand le chemin vers la commande est correcte alors on lance la commande
                 if(existenceCheminVersCmdExt(save,tokens0[tailleApresSeparation - 1]) == 1){
-                    tokens[0] = tokens0[tailleApresSeparation - 1];
-                    //printf("Bref tokens[0] est %s \n",tokens[0]);
-                    if (il_ya_eu_etoile) val = cext(tokens_avec_fichiers_etoile,nb_arg_tokens_avec_fichiers_etoile,path); 
-                    else val = cext(tokens,size,path); 
+                    if(droitdExecuterLaCmdExt(save, tokens0[tailleApresSeparation - 1])==1){
+                        tokens[0] = tokens0[tailleApresSeparation - 1];
+                        //printf("Bref tokens[0] est %s \n",tokens[0]);
+                        if (il_ya_eu_etoile) val = cext(tokens_avec_fichiers_etoile,nb_arg_tokens_avec_fichiers_etoile,path); 
+                        else val = cext(tokens,size,path);
+                    }
+                    else{
+                        val = 126;
+                        //write(STDERR_FILENO,"bash: ./nonexistent: No such file or directory\n",50);
+                        write(STDERR_FILENO,"bash: ",7);
+                        write(STDERR_FILENO,tokens[0],strlen(tokens[0]));
+                        write(STDERR_FILENO,": Permission denied\n",22);
+                    }
                 }
                 else{//Le cas où le chemin est incorrecte on renvoie la valeur d'erreur 1
-                    //val = 1;
+                    //tokens[0] = tokens0[tailleApresSeparation - 1];
+                    //printf("Bref tokens[0] est %s \n",tokens[0]);
+                    // if (il_ya_eu_etoile) val = cext(tokens_avec_fichiers_etoile,nb_arg_tokens_avec_fichiers_etoile,path); 
+                    // else val = cext(tokens,size,path); 
+                    val = 127;
+                    //write(STDERR_FILENO,"bash: ./nonexistent: No such file or directory\n",50);
+                    write(STDERR_FILENO,"bash: ",7);
+                    write(STDERR_FILENO,tokens[0],strlen(tokens[0]));
+                    write(STDERR_FILENO,": No such file or directory\n",30);
+                    // printf("bash: %d: No such file or directory\n",tokens[0]);
                 }
                 free(save);
                 free(tmpToken0);
@@ -407,10 +473,28 @@ int main(int argc, char **argv) {
             }
             //Si ce n'est pas un chemin vers une commande externe c'est à dire que c'est juste une commande externe
             else{
-                //printf("Avant Chemin normal\n");
-                if (il_ya_eu_etoile) val = cext(tokens_avec_fichiers_etoile,nb_arg_tokens_avec_fichiers_etoile,path); 
-                else val = cext(tokens,size,path); 
-                //printf("Apres Chemin normal\n");
+                //On verifie si c'est une commande externe
+                if(existenceCommandeExterne(tokens[0]) == 1){
+                    //printf("Avant Chemin normal\n");
+                    if (il_ya_eu_etoile){
+                        val = cext(tokens_avec_fichiers_etoile,nb_arg_tokens_avec_fichiers_etoile,path); 
+                    }
+                    else{
+                        val = cext(tokens,size,path); 
+                    } 
+                    //printf("Apres Chemin normal\n");
+                }
+                else{
+                    //Commande inexistante
+                    // if (il_ya_eu_etoile){
+                    //     val = cext(tokens_avec_fichiers_etoile,nb_arg_tokens_avec_fichiers_etoile,path); 
+                    // }
+                    // else{
+                    //     val = cext(tokens,size,path); 
+                    // } 
+                    val = 127;
+                    // printf("bash: %d: No such file or directory\n",tokens[0]);
+                }
             }
             //On free le tableau avec les fichiers etoiles
             for(int i = 0; i < nb_arg_tokens_avec_fichiers_etoile; i++){
@@ -418,8 +502,12 @@ int main(int argc, char **argv) {
             }
             free(tokens_avec_fichiers_etoile);
         }
+        //On cherche le nombre de caractère de val
+        char valeur[5];
+        sprintf(valeur,"%d",val);
+        int taille_val= strlen(valeur);
         //Pour mettre la variable chemin à jour
-        tronquageA30Characteres(path->data,chemin,val);
+        tronquageA30Characteres(path->data,chemin,val,taille_val);
         // readline fait un malloc à chaque fois donc on dois le free à la fin
         //free(argv);
         free(tmp);
@@ -427,6 +515,7 @@ int main(int argc, char **argv) {
     }
     //Pour faire un free de path
     string_delete(path);
+    string_delete(pathBefore);
     return val;
 }
 
